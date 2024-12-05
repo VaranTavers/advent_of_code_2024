@@ -1,11 +1,6 @@
-use std::{
-    fs::File,
-    io::{BufRead, BufReader},
-};
+use std::{fs::File, io::BufReader};
 
 use crate::utils::{CharMap, To};
-
-use regex::Regex;
 
 const WORD: &str = "XMAS";
 
