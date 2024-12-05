@@ -3,66 +3,83 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-#[derive(PartialEq, Eq)]
-pub enum Sorted {
-    Ascending,
-    Descending,
-}
-
-pub fn is_safe(list: &[i64]) -> bool {
-    let sorted;
-    if list[0] > list[1] {
-        sorted = Sorted::Descending;
-    } else if list[1] > list[0] {
-        sorted = Sorted::Ascending;
-    } else {
-        return false;
-    }
-
-    for (a, b) in list.iter().zip(list.iter().skip(1)) {
-        if (a >= b && sorted == Sorted::Ascending) || (a <= b && sorted == Sorted::Descending) {
-            return false;
-        }
-        if (a - b).abs() > 3 || (a - b).abs() < 1 {
-            return false;
-        }
-    }
-
-    true
-}
-
-pub fn input(reader: BufReader<File>) -> Vec<Vec<i64>> {
-    reader
-        .lines()
-        .map(|x| {
-            x.unwrap()
-                .split(' ')
-                .map(|y| y.parse::<i64>().unwrap())
-                .collect::<Vec<i64>>()
-        })
-        .collect::<Vec<Vec<i64>>>()
-}
+use regex::Regex;
 
 pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
-    let lines = input(reader);
+    let regex = Regex::new("mul\\(([0-9]+),([0-9]+)\\)").unwrap();
 
-    Ok(lines.iter().filter(|x| is_safe(x)).count() as i64)
+    let mut sum = 0;
+    for line in reader.lines() {
+        for val in regex.captures_iter(&line.unwrap()) {
+            let (_, parts): (&str, [&str; 2]) = val.extract();
+            sum += parts[0].parse::<i64>().unwrap() * parts[1].parse::<i64>().unwrap();
+        }
+    }
+
+    Ok(sum)
 }
 
 /* SOLUTION 2 */
 
-pub fn is_safe_dampened(v2: &[i64]) -> bool {
-    let mut variations = (0..v2.len()).map(|x| {
-        let mut res = v2.to_owned();
-        res.remove(x);
-        res
-    });
+pub fn get_closest_from_list(val: usize, list: &[usize]) -> usize {
+    if list.len() == 0 || list[0] > val {
+        return 0;
+    }
+    for (v1, v2) in list.iter().zip(list.iter().skip(1)) {
+        if *v2 > val {
+            return *v1;
+        }
+    }
 
-    variations.any(|x| is_safe(&x))
+    return *list.last().unwrap();
+}
+
+pub fn is_enabled(val: usize, dos: &[usize], donts: &[usize], base: bool) -> bool {
+    if dos.len() == 0 && donts.len() == 0 {
+        return base;
+    }
+    let a = get_closest_from_list(val, dos);
+    let b = get_closest_from_list(val, donts);
+    if a == b {
+        return base;
+    }
+
+    a > b
 }
 
 pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
-    let lines = input(reader);
+    let regex = Regex::new("mul\\(([0-9]+),([0-9]+)\\)").unwrap();
 
-    Ok(lines.iter().filter(|x| is_safe_dampened(x)).count() as i64)
+    let mut enabled_for_row = true;
+    let mut sum = 0;
+    for line in reader.lines() {
+        let line = line.unwrap();
+        let do_indices = line
+            .match_indices("do()")
+            .map(|(i, _)| i)
+            .collect::<Vec<usize>>();
+        let dont_indices = line
+            .match_indices("don't()")
+            .map(|(i, _)| i)
+            .collect::<Vec<usize>>();
+        //println!("{do_indices:?}");
+        //println!("{dont_indices:?}");
+        for val in regex.captures_iter(&line) {
+            let start = val.get(0).unwrap().start();
+            //println!("AA: {start}");
+            if is_enabled(start, &do_indices, &dont_indices, enabled_for_row) {
+                let (_, parts): (&str, [&str; 2]) = val.extract();
+                /*println!(
+                    "{}, {}",
+                    parts[0].parse::<i64>().unwrap(),
+                    parts[1].parse::<i64>().unwrap()
+                );*/
+                sum += parts[0].parse::<i64>().unwrap() * parts[1].parse::<i64>().unwrap();
+            }
+        }
+        enabled_for_row =
+            do_indices.last().cloned().unwrap_or(0) > dont_indices.last().cloned().unwrap_or(0);
+    }
+
+    Ok(sum)
 }

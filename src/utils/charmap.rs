@@ -88,6 +88,14 @@ impl CharMap {
 
         res
     }
+
+    pub fn is_valid_coords(&self, (row, col): (usize, usize)) -> bool {
+        row < self.map.len() && col < self.map[row].len()
+    }
+
+    pub fn get(&self, (row, col): (usize, usize)) -> Option<char> {
+        self.map.get(row).map(|x| x.get(col)).flatten().cloned()
+    }
 }
 
 impl Display for CharMap {
