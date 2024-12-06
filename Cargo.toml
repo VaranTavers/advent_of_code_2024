@@ -1,7 +1,15 @@
 [package]
-name = "AdventOfCode"
+name = "advent_of_code_2024"
 version = "0.1.0"
 edition = "2021"
 
 [dependencies]
 regex = "1.11.1"
+
+[lib]
+name = "helper_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "runner"
+path = "src/main.rs"

@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufReader};
 
-use crate::utils::{CharMap, To};
+use crate::helper_lib::utils::{CharMap, To};
 
 const WORD: &str = "XMAS";
 

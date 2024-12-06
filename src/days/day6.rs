@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufReader};
 
-use crate::utils::{CharMap, To};
+use crate::helper_lib::utils::{CharMap, To};
 
 pub fn get_next_position_and_dir(
     cmap: &CharMap,

@@ -8,9 +8,8 @@ use crate::days::{
     day6, /*day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day20, day21,
          day22, day23, day24, day25,     day7, day8, day9,*/
 };
-
+extern crate helper_lib;
 mod days;
-mod utils;
 
 fn main() -> Result<(), io::Error> {
     let day = 6;
