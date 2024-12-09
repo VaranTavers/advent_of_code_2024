@@ -96,6 +96,10 @@ impl CharMap {
     pub fn get(&self, (row, col): (usize, usize)) -> Option<char> {
         self.map.get(row).map(|x| x.get(col)).flatten().cloned()
     }
+
+    pub fn iter(&self) -> CharMapIterator {
+        CharMapIterator::new(self)
+    }
 }
 
 impl Display for CharMap {
@@ -108,5 +112,38 @@ impl Display for CharMap {
         }
 
         Ok(())
+    }
+}
+
+pub struct CharMapIterator<'a> {
+    row: usize,
+    col: usize,
+    cmap: &'a CharMap,
+}
+
+impl<'a> CharMapIterator<'a> {
+    pub fn new(cmap: &'a CharMap) -> Self {
+        CharMapIterator {
+            row: 0,
+            col: 0,
+            cmap,
+        }
+    }
+}
+
+impl<'a> Iterator for CharMapIterator<'a> {
+    type Item = (usize, usize, char);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.col += 1;
+        if self.col >= self.cmap.map[self.row].len() {
+            self.col = 0;
+            self.row += 1;
+        }
+        if self.row >= self.cmap.map.len() {
+            return None;
+        }
+
+        return Some((self.row, self.col, self.cmap.map[self.row][self.col]));
     }
 }
