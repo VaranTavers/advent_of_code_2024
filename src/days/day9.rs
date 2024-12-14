@@ -11,7 +11,7 @@ pub fn get_num_char(reader: BufReader<File>) -> Vec<u8> {
         .expect("No lines")
         .expect("Line read error")
         .chars()
-        .map(|x| (x as u8 - '0' as u8))
+        .map(|x| (x as u8 - b'0'))
         .collect()
 }
 
@@ -37,18 +37,18 @@ pub fn naive_solution(nums: &[u8]) -> u64 {
     let mut sum = 0;
     let mut pos = 0;
 
-    println!("{:?}", v);
+    println!("{v:?}");
     //println!("{}", v.len());
-    while v.len() > 0 {
+    while !v.is_empty() {
         //println!("{}", v.len());
         if v[0].is_some() {
             println!("{} * {pos}", v[0].unwrap());
             sum += v.pop_front().unwrap().unwrap() * pos;
         } else {
-            while v.len() > 0 && v[v.len() - 1].is_none() {
+            while !v.is_empty() && v[v.len() - 1].is_none() {
                 v.pop_back();
             }
-            if v.len() == 0 {
+            if v.is_empty() {
                 break;
             }
             println!("{} * {pos}", v[v.len() - 1].unwrap());
@@ -63,7 +63,7 @@ pub fn naive_solution(nums: &[u8]) -> u64 {
 }
 
 pub fn smart_solution(nums: &[u8]) -> u64 {
-    let mut nums = nums.iter().cloned().collect::<Vec<u8>>();
+    let mut nums = nums.to_vec();
     let mut begin = 0;
     let mut pos = 0;
     let mut end = nums.len() - 1;
@@ -144,9 +144,9 @@ fn find_space_at_least_size_lt_j(
         }
         if i >= size {
             return Some(k);
-        } else {
-            k += i;
         }
+
+        k += i;
     }
 }
 
@@ -187,23 +187,20 @@ pub fn naive_solution_2(nums: &[u8]) -> u64 {
         let place = find_space_at_least_size_lt_j(&v, i - j + 1, j);
         // Move
         if let Some(k) = place {
-            for ii in 0..(i - j + 1) {
+            for ii in 0..=(i - j) {
                 v.swap(k + ii, j + ii);
             }
         }
         i = j - 1;
     }
     let mut sum = 0;
-    let mut pos = 0;
 
     //println!("{:?}", v);
     //println!("{}", v.len());
-    for x in v.iter() {
+    for (pos, x) in v.iter().enumerate() {
         if let Some(val) = x {
-            sum += pos * val;
+            sum += pos as u64 * val;
         }
-
-        pos += 1;
     }
 
     sum

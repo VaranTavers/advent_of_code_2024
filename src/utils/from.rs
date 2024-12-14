@@ -7,6 +7,7 @@ pub enum From {
 }
 
 impl From {
+    #[must_use]
     pub fn to_usize(&self) -> usize {
         match self {
             From::Bottom => 0,

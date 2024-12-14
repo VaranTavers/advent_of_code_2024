@@ -15,18 +15,16 @@ fn calculate_antinodes(
     let pos1 = (x1 - dx, y1 - dy);
     let pos2 = (x2 + dx, y2 + dy);
 
-    let p1;
-    let p2;
-    if pos1.0 >= 0 && pos1.1 >= 0 {
-        p1 = Some((pos1.0 as usize, pos1.1 as usize));
+    let p1 = if pos1.0 >= 0 && pos1.1 >= 0 {
+        Some((pos1.0 as usize, pos1.1 as usize))
     } else {
-        p1 = None;
-    }
-    if pos2.0 >= 0 && pos2.1 >= 0 {
-        p2 = Some((pos2.0 as usize, pos2.1 as usize));
+        None
+    };
+    let p2 = if pos2.0 >= 0 && pos2.1 >= 0 {
+        Some((pos2.0 as usize, pos2.1 as usize))
     } else {
-        p2 = None;
-    }
+        None
+    };
 
     (p1, p2)
 }
@@ -44,7 +42,7 @@ fn get_letter_positions(cmap: &CharMap) -> HashMap<char, Vec<(usize, usize)>> {
     res
 }
 
-pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
+pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let cmap = CharMap::parse_map(reader);
 
     let mut antinodes = cmap.map_to_val(false);
@@ -83,7 +81,7 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     Ok(antinodes
         .iter()
         .map(|x| x.iter().filter(|y| **y).count())
-        .sum::<usize>() as i64)
+        .sum::<usize>())
 }
 
 /* SOLUTION 2 */
@@ -143,7 +141,7 @@ fn calculate_antinodes_all(
     negs
 }
 
-pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
+pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let cmap = CharMap::parse_map(reader);
 
     let mut antinodes = cmap.map_to_val(false);
@@ -158,7 +156,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
                     (cmap.map.len(), cmap.map[0].len()),
                 );
 
-                for (row, col) in v1.iter() {
+                for (row, col) in &v1 {
                     antinodes[*row][*col] = true;
                 }
             }
@@ -180,5 +178,5 @@ pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     Ok(antinodes
         .iter()
         .map(|x| x.iter().filter(|y| **y).count())
-        .sum::<usize>() as i64)
+        .sum::<usize>())
 }

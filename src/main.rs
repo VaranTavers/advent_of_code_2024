@@ -16,7 +16,7 @@ fn main() -> Result<(), io::Error> {
     let day = 14;
     let part = 2;
 
-    let f = File::open(format!("inputs/input{}.txt", day))?;
+    let f = File::open(format!("inputs/input{day}.txt"))?;
     let reader = BufReader::new(f);
 
     print!("Day {day} (Part: {part}): ");

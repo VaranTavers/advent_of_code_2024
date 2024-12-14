@@ -5,13 +5,11 @@ use std::{
 
 pub fn read_rules(lines: &mut Lines<BufReader<File>>) -> Vec<(usize, usize)> {
     let mut res = Vec::new();
-    for line in lines {
-        if let Ok(line) = line {
-            if let Some((a, b)) = line.split_once('|') {
-                res.push((a.parse::<usize>().unwrap(), b.parse::<usize>().unwrap()));
-            } else {
-                return res;
-            }
+    for line in lines.flatten() {
+        if let Some((a, b)) = line.split_once('|') {
+            res.push((a.parse::<usize>().unwrap(), b.parse::<usize>().unwrap()));
+        } else {
+            return res;
         }
     }
     res
@@ -20,19 +18,17 @@ pub fn read_rules(lines: &mut Lines<BufReader<File>>) -> Vec<(usize, usize)> {
 pub fn read_updates(lines: &mut Lines<BufReader<File>>) -> Vec<(Vec<usize>, [usize; 100])> {
     let mut res = Vec::new();
 
-    for line in lines {
-        if let Ok(line) = line {
-            let vals = line
-                .split(',')
-                .map(|x| x.parse::<usize>().unwrap())
-                .collect::<Vec<usize>>();
-            let mut indices = [1000; 100];
+    for line in lines.flatten() {
+        let vals = line
+            .split(',')
+            .map(|x| x.parse::<usize>().unwrap())
+            .collect::<Vec<usize>>();
+        let mut indices = [1000; 100];
 
-            for (i, val) in vals.iter().enumerate() {
-                indices[*val] = i;
-            }
-            res.push((vals, indices));
+        for (i, val) in vals.iter().enumerate() {
+            indices[*val] = i;
         }
+        res.push((vals, indices));
     }
 
     res

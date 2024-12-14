@@ -7,16 +7,14 @@ pub fn get_lists_from_lines(lines: &mut Lines<BufReader<File>>) -> (Vec<i64>, Ve
     let mut v1 = Vec::new();
     let mut v2 = Vec::new();
 
-    for line in lines {
-        if let Ok(line) = line {
-            let parts = line.split(' ').collect::<Vec<&str>>();
-            //println!("{parts:?}");
-            let num1 = parts[0].parse::<i64>().expect("NaN num 1");
-            let num2 = parts[3].parse::<i64>().expect("NaN num 2");
+    for line in lines.flatten() {
+        let parts = line.split(' ').collect::<Vec<&str>>();
+        //println!("{parts:?}");
+        let num1 = parts[0].parse::<i64>().expect("NaN num 1");
+        let num2 = parts[3].parse::<i64>().expect("NaN num 2");
 
-            v1.push(num1);
-            v2.push(num2);
-        }
+        v1.push(num1);
+        v2.push(num2);
     }
 
     (v1, v2)
@@ -24,8 +22,8 @@ pub fn get_lists_from_lines(lines: &mut Lines<BufReader<File>>) -> (Vec<i64>, Ve
 
 pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let (mut v1, mut v2) = get_lists_from_lines(&mut reader.lines());
-    v1.sort();
-    v2.sort();
+    v1.sort_unstable();
+    v2.sort_unstable();
     Ok(v1.iter().zip(v2.iter()).map(|(x, y)| (y - x).abs()).sum())
 }
 

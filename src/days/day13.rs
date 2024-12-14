@@ -15,16 +15,11 @@ pub fn gen_nums_from_line(line: &str, c: char) -> (f64, f64) {
 
 pub fn get_line(lines: &mut Lines<BufReader<File>>, needle: &str, op: char) -> Option<(f64, f64)> {
     let row = lines.next();
-    if row.is_none() {
-        return None;
-    }
+    row.as_ref();
     let mut row = row.unwrap().unwrap();
     while !row.contains(needle) {
         let row_opt = lines.next();
-        if row_opt.is_none() {
-            return None;
-        }
-        row = row_opt.unwrap().unwrap();
+        row = row_opt?.unwrap();
     }
     Some(gen_nums_from_line(&row, op))
 }
@@ -80,7 +75,7 @@ pub fn solution(reader: BufReader<File>) -> Result<f64, std::io::Error> {
 
 /* SOLUTION 2 */
 
-const VAL: f64 = 10000000000000.0;
+const VAL: f64 = 10_000_000_000_000.0;
 
 pub fn solution2(reader: BufReader<File>) -> Result<f64, std::io::Error> {
     let mut lines = reader.lines();

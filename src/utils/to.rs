@@ -11,6 +11,7 @@ pub enum To {
 }
 
 impl To {
+    #[must_use]
     pub fn move_to(&self, (row, col): (usize, usize)) -> Option<(usize, usize)> {
         match self {
             Self::Bottom => Some((row + 1, col)),
@@ -49,6 +50,7 @@ impl To {
         }
     }
 
+    #[must_use]
     pub fn all_directions() -> [Self; 8] {
         [
             Self::TopLeft,
@@ -62,10 +64,12 @@ impl To {
         ]
     }
 
+    #[must_use]
     pub fn cardinal_directions() -> [Self; 4] {
         [Self::Top, Self::Left, Self::Right, Self::Bottom]
     }
 
+    #[must_use]
     pub fn x_directions() -> [Self; 4] {
         [
             Self::TopLeft,
@@ -75,6 +79,7 @@ impl To {
         ]
     }
 
+    #[must_use]
     pub fn turn_right_90(&self) -> Self {
         match self {
             Self::TopLeft => Self::TopRight,
@@ -87,6 +92,7 @@ impl To {
             Self::BottomRight => Self::BottomLeft,
         }
     }
+    #[must_use]
     pub fn turn_left_90(&self) -> Self {
         match self {
             Self::TopRight => Self::TopLeft,
@@ -100,6 +106,7 @@ impl To {
         }
     }
 
+    #[must_use]
     pub fn turn_180(&self) -> Self {
         match self {
             Self::TopRight => Self::BottomLeft,
@@ -113,6 +120,7 @@ impl To {
         }
     }
 
+    #[must_use]
     pub fn to_number(&self) -> usize {
         match self {
             Self::TopLeft => 5,

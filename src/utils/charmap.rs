@@ -10,22 +10,23 @@ pub struct CharMap {
 }
 
 impl CharMap {
+    #[must_use]
     pub fn parse_map(reader: BufReader<File>) -> CharMap {
         let map = reader
             .lines()
-            .flatten()
+            .map_while(Result::ok)
             .map(|line| line.chars().collect())
             .collect::<Vec<Vec<char>>>();
 
         CharMap { map }
     }
 
+    #[must_use]
     pub fn parse_maps(reader: BufReader<File>) -> Vec<CharMap> {
         let mut res = Vec::new();
         let mut map = Vec::new();
 
-        for line in reader.lines() {
-            let line = line.unwrap();
+        for line in reader.lines().map_while(Result::ok) {
             if line.is_empty() {
                 if !map.is_empty() {
                     res.push(CharMap { map });
@@ -57,13 +58,14 @@ impl CharMap {
     {
         let mut res = Vec::new();
 
-        for line in self.map.iter() {
+        for line in &self.map {
             res.push(line.iter().map(&f).collect::<Vec<T>>());
         }
 
         res
     }
 
+    #[must_use]
     pub fn find_first(&self, needle: char) -> Option<(usize, usize)> {
         for (i, row) in self.map.iter().enumerate() {
             for (j, c) in row.iter().enumerate() {
@@ -76,6 +78,7 @@ impl CharMap {
         None
     }
 
+    #[must_use]
     pub fn find_all(&self, needle: char) -> Vec<(usize, usize)> {
         let mut res = Vec::new();
         for (i, row) in self.map.iter().enumerate() {
@@ -89,23 +92,36 @@ impl CharMap {
         res
     }
 
+    #[must_use]
     pub fn is_valid_coords(&self, (row, col): (usize, usize)) -> bool {
         row < self.map.len() && col < self.map[row].len()
     }
 
+    #[must_use]
     pub fn get(&self, (row, col): (usize, usize)) -> Option<char> {
-        self.map.get(row).map(|x| x.get(col)).flatten().cloned()
+        self.map.get(row).and_then(|x| x.get(col)).copied()
     }
 
+    #[must_use]
     pub fn iter(&self) -> CharMapIterator {
         CharMapIterator::new(self)
     }
 }
 
+impl<'a> IntoIterator for &'a CharMap {
+    type Item = (usize, usize, char);
+
+    type IntoIter = CharMapIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 impl Display for CharMap {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        for line in self.map.iter() {
-            for c in line.iter() {
+        for line in &self.map {
+            for c in line {
                 write!(f, "{c}")?;
             }
             writeln!(f)?;
@@ -131,7 +147,7 @@ impl<'a> CharMapIterator<'a> {
     }
 }
 
-impl<'a> Iterator for CharMapIterator<'a> {
+impl Iterator for CharMapIterator<'_> {
     type Item = (usize, usize, char);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -144,6 +160,6 @@ impl<'a> Iterator for CharMapIterator<'a> {
             return None;
         }
 
-        return Some((self.row, self.col, self.cmap.map[self.row][self.col]));
+        Some((self.row, self.col, self.cmap.map[self.row][self.col]))
     }
 }

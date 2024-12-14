@@ -136,10 +136,8 @@ pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     while visited_dir[position.0][position.1].is_none()
         || visited_dir[position.0][position.1].unwrap() != direction
     {
-        if visited_dir[position.0][position.1].is_none() {
-            if !does_guard_leave(&cmap, position) {
-                sum += 1;
-            }
+        if visited_dir[position.0][position.1].is_none() && !does_guard_leave(&cmap, position) {
+            sum += 1;
         }
         visited_dir[position.0][position.1] = Some(direction);
 

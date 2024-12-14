@@ -182,7 +182,7 @@ pub fn calculate_number_of_rocks_after_n(val: i128, n: usize, rocks: &[Vec<i128>
     let mut v = vec![val];
     blink(&mut v);
     let mut s = 0;
-    for val in v.iter() {
+    for val in &v {
         s += calculate_number_of_rocks_after_n(*val, n - 1, rocks);
     }
     //println!("{s} {}", v.len());
@@ -216,7 +216,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<i128, std::io::Error> {
             for i in 0..test.len() {
                 println!("{i}, {j}");
                 let mut sum = 0;
-                for t in test[i].iter() {
+                for t in &test[i] {
                     let v = calculate_number_of_rocks_after_n(*t, j, &rocks);
                     //println!("{v}");
                     sum += v;
@@ -234,7 +234,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<i128, std::io::Error> {
     }
 
     let mut s = 0;
-    for v in row.iter() {
+    for v in &row {
         s += calculate_number_of_rocks_after_n(*v, 60, &rocks);
     }
 

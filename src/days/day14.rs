@@ -60,14 +60,13 @@ pub fn print_debug_info(robots: &[Robot], bounds: &(i64, i64), blank_mid: bool) 
 pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let mut robots = reader
         .lines()
-        .flatten()
-        .map(|line| Robot::from_str(&line))
-        .flatten()
+        .map_while(Result::ok)
+        .flat_map(|line| Robot::from_str(&line))
         .collect::<Vec<Robot>>();
     let bounds = (101, 103);
 
     let mut quadrants = [0; 4];
-    for robot in robots.iter_mut() {
+    for robot in &mut robots {
         robot.move_n(100, &bounds);
         //println!("{robot:?}");
         if robot.p.1 < bounds.1 / 2 {
@@ -85,7 +84,7 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
         }
     }
 
-    Ok(quadrants.iter().fold(1, |acc, val| acc * val))
+    Ok(quadrants.iter().product())
 }
 
 /* SOLUTION 2
@@ -110,7 +109,7 @@ pub fn is_symmetric(robots: &[Robot], bounds: &(i64, i64)) -> bool {
 
 pub fn largest_continous_vertical_line(robots: &[Robot], bounds: &(i64, i64)) -> i64 {
     let mut a = vec![vec![false; bounds.0 as usize]; bounds.1 as usize];
-    for robot in robots.iter() {
+    for robot in robots {
         a[robot.p.1 as usize][robot.p.0 as usize] = true;
     }
 
@@ -137,16 +136,15 @@ pub fn largest_continous_vertical_line(robots: &[Robot], bounds: &(i64, i64)) ->
 pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let mut robots = reader
         .lines()
-        .flatten()
-        .map(|line| Robot::from_str(&line))
-        .flatten()
+        .map_while(Result::ok)
+        .flat_map(|line| Robot::from_str(&line))
         .collect::<Vec<Robot>>();
     let bounds = (101, 103);
 
     let mut i = 0;
     let mut max = 0;
     loop {
-        for robot in robots.iter_mut() {
+        for robot in &mut robots {
             robot.move_n(1, &bounds);
         }
         let val = largest_continous_vertical_line(&robots, &bounds);

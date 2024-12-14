@@ -22,7 +22,7 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
 /* SOLUTION 2 */
 
 pub fn get_closest_from_list(val: usize, list: &[usize]) -> usize {
-    if list.len() == 0 || list[0] > val {
+    if list.is_empty() || list[0] > val {
         return 0;
     }
     for (v1, v2) in list.iter().zip(list.iter().skip(1)) {
@@ -31,11 +31,11 @@ pub fn get_closest_from_list(val: usize, list: &[usize]) -> usize {
         }
     }
 
-    return *list.last().unwrap();
+    *list.last().unwrap()
 }
 
 pub fn is_enabled(val: usize, dos: &[usize], donts: &[usize], base: bool) -> bool {
-    if dos.len() == 0 && donts.len() == 0 {
+    if dos.is_empty() && donts.is_empty() {
         return base;
     }
     let a = get_closest_from_list(val, dos);
@@ -78,7 +78,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
             }
         }
         enabled_for_row =
-            do_indices.last().cloned().unwrap_or(0) > dont_indices.last().cloned().unwrap_or(0);
+            do_indices.last().copied().unwrap_or(0) > dont_indices.last().copied().unwrap_or(0);
     }
 
     Ok(sum)

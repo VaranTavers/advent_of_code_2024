@@ -68,14 +68,14 @@ pub fn backtrack_operators(
         }
         ops.pop();
     }
-    return false;
+    false
 }
 
 pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let rows = read_rows(reader);
 
     let mut sum = 0;
-    for (goal, nums) in rows.iter() {
+    for (goal, nums) in &rows {
         let mut ops = Vec::new();
         if backtrack_operators(
             0,
@@ -97,7 +97,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let rows = read_rows(reader);
 
     let mut sum = 0;
-    for (goal, nums) in rows.iter() {
+    for (goal, nums) in &rows {
         let mut ops = Vec::new();
         if backtrack_operators(
             0,

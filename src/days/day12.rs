@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fs::File, io::BufReader};
+use std::{fs::File, io::BufReader};
 
 use helper_lib::utils::{CharMap, To};
 
@@ -9,7 +9,7 @@ pub fn get_region(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize, 
     let mut perim = 0;
     //println!("{i},{j}");
     let mut points = vec![(i, j)];
-    while points.len() > 0 {
+    while !points.is_empty() {
         let mut neigh = 0;
         let p = points.pop().unwrap();
         if cmap.map[p.0][p.1] != '.' {
@@ -45,7 +45,7 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
         for j in 0..cmap.map[i].len() {
             if cmap.map[i][j] != '/' {
                 let new_region = get_region(&cmap, (i, j));
-                for (ii, jj) in new_region.1.iter() {
+                for (ii, jj) in &new_region.1 {
                     cmap.map[*ii][*jj] = '/';
                 }
                 regions.push(new_region);
@@ -216,7 +216,7 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
     let mut horiz_lines = cmap.map_to_val(false);
     horiz_lines.push(horiz_lines[0].clone());
     let mut vert_lines = cmap.map_to_val(false);
-    for l in vert_lines.iter_mut() {
+    for l in &mut vert_lines {
         l.push(false);
     }
 
@@ -224,7 +224,7 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
     let mut res = Vec::new();
     //println!("{i},{j}");
     let mut points = vec![(i, j)];
-    while points.len() > 0 {
+    while !points.is_empty() {
         let p = points.pop().unwrap();
         if cmap.map[p.0][p.1] != '.' {
             cmap.map[p.0][p.1] = '.';
@@ -254,25 +254,21 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
                                 //println!("{p:?} RIGHT");
                             }
                         }
+                    } else if dir == To::Bottom {
+                        horiz_lines[p.0 + 1][p.1] = true;
+
+                        //println!("{p:?} BOTTOM_MAP");
                     } else {
-                        if dir == To::Bottom {
-                            horiz_lines[p.0 + 1][p.1] = true;
+                        vert_lines[p.0][p.1 + 1] = true;
 
-                            //println!("{p:?} BOTTOM_MAP");
-                        } else {
-                            vert_lines[p.0][p.1 + 1] = true;
-
-                            //println!("{p:?} RIGHT_MAP");
-                        }
+                        //println!("{p:?} RIGHT_MAP");
                     }
+                } else if dir == To::Top {
+                    horiz_lines[p.0][p.1] = true;
+                    //println!("{p:?} TOP_MAP");
                 } else {
-                    if dir == To::Top {
-                        horiz_lines[p.0][p.1] = true;
-                        //println!("{p:?} TOP_MAP");
-                    } else {
-                        vert_lines[p.0][p.1] = true;
-                        //println!("{p:?} LEFT_MAP");
-                    }
+                    vert_lines[p.0][p.1] = true;
+                    //println!("{p:?} LEFT_MAP");
                 }
             }
 
@@ -297,10 +293,10 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
                 print!("  ");
             }
         }
-        println!("");
+        println!();
     }
     print!(" ");
-    for j in horiz_lines[horiz_lines.len() - 1].iter() {
+    for j in &horiz_lines[horiz_lines.len() - 1] {
         if *j {
             print!("- ");
         } else {
@@ -319,7 +315,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
         for j in 0..cmap.map[i].len() {
             if cmap.map[i][j] != '/' {
                 let new_region = get_region_2(&cmap, (i, j));
-                for (ii, jj) in new_region.1.iter() {
+                for (ii, jj) in &new_region.1 {
                     cmap.map[*ii][*jj] = '/';
                 }
                 regions.push(new_region);
