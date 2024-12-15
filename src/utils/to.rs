@@ -134,3 +134,18 @@ impl To {
         }
     }
 }
+
+impl TryFrom<char> for To {
+    type Error = ();
+
+    fn try_from(value: char) -> Result<Self, Self::Error> {
+        match value {
+            '^' => Ok(Self::Top),
+            '<' => Ok(Self::Left),
+            '>' => Ok(Self::Right),
+            'V' => Ok(Self::Bottom),
+            'v' => Ok(Self::Bottom),
+            _ => Err(()),
+        }
+    }
+}

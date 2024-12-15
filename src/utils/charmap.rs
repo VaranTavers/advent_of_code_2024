@@ -11,6 +11,15 @@ pub struct CharMap {
 
 impl CharMap {
     #[must_use]
+    pub fn parse_map_string(reader: Vec<String>) -> CharMap {
+        let map = reader
+            .iter()
+            .map(|line| line.chars().collect())
+            .collect::<Vec<Vec<char>>>();
+
+        CharMap { map }
+    }
+    #[must_use]
     pub fn parse_map(reader: BufReader<File>) -> CharMap {
         let map = reader
             .lines()
