@@ -133,6 +133,25 @@ impl To {
             Self::BottomRight => 8,
         }
     }
+
+    #[must_use]
+    pub fn to_index(&self) -> usize {
+        self.to_number() - 1
+    }
+
+    pub fn from_number(num: usize) -> Self {
+        match num {
+            5 => Self::TopLeft,
+            1 => Self::Top,
+            6 => Self::TopRight,
+            2 => Self::Left,
+            3 => Self::Right,
+            7 => Self::BottomLeft,
+            4 => Self::Bottom,
+            8 => Self::BottomRight,
+            _ => Self::Top,
+        }
+    }
 }
 
 impl TryFrom<char> for To {
