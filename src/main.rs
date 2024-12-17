@@ -4,8 +4,8 @@ use std::{
 };
 
 use crate::days::{
-    day1, day10, day11, day12, day13, day14, day15,
-    day16, /*       day17, day18, day19, day20, day21,
+    day1, day10, day11, day12, day13, day14, day15, day16,
+    day17, /*        day18, day19, day20, day21,
            day22, day23, day24, day25,       */
     day2, day3, day4, day5, day6, day7, day8, day9,
 };
@@ -13,7 +13,7 @@ extern crate helper_lib;
 mod days;
 
 fn main() -> Result<(), io::Error> {
-    let day = 16;
+    let day = 17;
     let part = 2;
 
     let f = File::open(format!("inputs/input{day}.txt"))?;
@@ -39,8 +39,8 @@ fn main() -> Result<(), io::Error> {
                 14 => println!("{}", day14::solution(reader).unwrap()),
                 15 => println!("{}", day15::solution(reader).unwrap()),
                 16 => println!("{}", day16::solution(reader).unwrap()),
-                /*17 => println!("{}", day17::solution(reader).unwrap()),
-                18 => println!("{}", day18::solution(reader).unwrap()),
+                17 => println!("{}", day17::solution(reader).unwrap()),
+                /*18 => println!("{}", day18::solution(reader).unwrap()),
                 19 => println!("{}", day19::solution(reader).unwrap()),
                 20 => println!("{}", day20::solution(reader).unwrap()),
                 21 => println!("{}", day21::solution(reader).unwrap()),
@@ -69,8 +69,8 @@ fn main() -> Result<(), io::Error> {
                 14 => println!("{}", day14::solution2(reader).unwrap()),
                 15 => println!("{}", day15::solution2(reader).unwrap()),
                 16 => println!("{}", day16::solution2(reader).unwrap()),
-                /*17 => println!("{}", day17::solution_2(reader).unwrap()),
-                18 => println!("{}", day18::solution_2(reader).unwrap()),
+                17 => println!("{}", day17::solution2(reader).unwrap()),
+                /*18 => println!("{}", day18::solution_2(reader).unwrap()),
                 19 => println!("{}", day19::solution_2(reader).unwrap()),
                 20 => println!("{}", day20::solution_2(reader).unwrap()),
                 21 => println!("{}", day21::solution_2(reader).unwrap()),
