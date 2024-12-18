@@ -11,6 +11,11 @@ pub struct CharMap {
 
 impl CharMap {
     #[must_use]
+    pub fn from_size_char(rows: usize, cols: usize, c: char) -> CharMap {
+        let map = (0..rows).map(|_| vec![c; cols]).collect::<Vec<Vec<char>>>();
+        CharMap { map }
+    }
+    #[must_use]
     pub fn parse_map_string(reader: Vec<String>) -> CharMap {
         let map = reader
             .iter()
