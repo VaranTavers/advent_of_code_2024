@@ -1,51 +1,57 @@
 use std::{
-    collections::HashSet,
     fs::File,
     io::{BufRead, BufReader},
 };
 
-pub fn get_hash_set(line: &str) -> HashSet<String> {
-    let mut res = HashSet::new();
+pub fn get_arrangements_set(line: &str) -> Vec<(String, usize)> {
+    let mut res = Vec::new();
     for word in line.split(", ") {
-        res.insert(word.to_owned());
+        //if !word.contains('w') {
+        // Only w is not in elemental form
+        res.push((word.to_owned(), word.len()));
+        //}
     }
 
     res
 }
 
-pub fn is_valid(part: &str, set: &mut HashSet<String>, tabs: usize) -> bool {
-    //println!("{}{part}", "\t".repeat(tabs));
-    if set.contains(part) {
-        return true;
+pub fn graph_alg(part: &[char], match_indices: &[(usize, usize)]) -> bool {
+    let mut points = part.iter().map(|_| false).collect::<Vec<bool>>();
+    points.push(true);
+    for (s, l) in match_indices.iter().rev() {
+        points[*s] |= points[*s + *l];
     }
-    if !part.contains('w') {
-        // only white is not elemental
-        return true;
-    }
-    for i in 1..part.len() {
-        let parts = part.split_at(i);
-        if is_valid(parts.0, set, tabs + 1) && is_valid(parts.1, set, tabs + 1) {
-            //set.insert(parts.0.to_owned());
-            //set.insert(parts.1.to_owned());
-            return true;
+    //println!("{points:?}");
+    return points[0];
+}
+
+pub fn is_valid(part: &str, set: &[(String, usize)]) -> bool {
+    let mut match_indices = Vec::new();
+
+    //println!("{set:?}");
+    for (reg, len) in set.iter() {
+        for val in part.match_indices(reg) {
+            match_indices.push((val.0, *len));
         }
     }
 
-    return false;
+    match_indices.sort();
+    //println!("{match_indices:?}");
+
+    let chars = part.chars().collect::<Vec<char>>();
+    return graph_alg(&chars, &match_indices);
 }
 
 pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let mut lines = reader.lines().map_while(Result::ok);
-    let mut hset = get_hash_set(&lines.next().unwrap());
+    let hset = get_arrangements_set(&lines.next().unwrap());
     lines.next(); // Empty line
-
-    println!("PRE_DONE");
 
     let mut sum = 0;
 
     for line in lines {
-        println!("{line}");
-        if is_valid(&line, &mut hset, 0) {
+        //println!("{line}");
+        if is_valid(&line, &hset) {
             sum += 1;
         }
     }
@@ -55,8 +61,48 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
 
 /* SOLUTION 2 */
 
-// Interesting solutions read after bruteforcing it: only recalculate if a block landed on the best route, go backwards and see when is the first route possible
+pub fn graph_alg2(part: &[char], match_indices: &[(usize, usize)]) -> u128 {
+    let mut points = part.iter().map(|_| 0_u128).collect::<Vec<u128>>();
+    points.push(1);
+    for (s, l) in match_indices.iter().rev() {
+        points[*s] += points[*s + *l];
+    }
+    println!("{points:?}");
+    return points[0];
+}
 
-pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
-    Ok(0)
+// Some help was required in order to realize that match_indices doesn't handle the "brbrbr" case well if you are searching for "brbr"
+pub fn is_valid2(part: &str, set: &[(String, usize)]) -> u128 {
+    let mut match_indices = Vec::new();
+
+    let chars = part.chars().collect::<Vec<char>>();
+    //println!("{set:?}");
+    for (reg, len) in set.iter() {
+        for i in 0..chars.len() {
+            let (_a, b) = part.split_at(i);
+            if b.starts_with(reg) {
+                match_indices.push((i, *len));
+            }
+        }
+    }
+
+    match_indices.sort();
+    //println!("{match_indices:?}");
+
+    return graph_alg2(&chars, &match_indices);
+}
+
+pub fn solution2(reader: BufReader<File>) -> Result<u128, std::io::Error> {
+    let mut lines = reader.lines().map_while(Result::ok);
+    let hset = get_arrangements_set(&lines.next().unwrap());
+    lines.next(); // Empty line
+
+    let mut sum = 0;
+
+    for line in lines {
+        //println!("{line}");
+        sum += is_valid2(&line, &hset);
+    }
+
+    Ok(sum)
 }
