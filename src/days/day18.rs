@@ -1,7 +1,6 @@
 use std::{
     cmp::Reverse,
     collections::BinaryHeap,
-    fmt::format,
     fs::File,
     io::{BufRead, BufReader},
 };
@@ -96,6 +95,8 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
 }
 
 /* SOLUTION 2 */
+
+// Interesting solutions read after bruteforcing it: only recalculate if a block landed on the best route, go backwards and see when is the first route possible
 
 pub fn solution2(reader: BufReader<File>) -> Result<String, std::io::Error> {
     let lines = reader.lines().map_while(Result::ok);
