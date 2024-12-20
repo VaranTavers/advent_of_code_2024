@@ -116,6 +116,12 @@ impl CharMap {
         self.map.get(row).and_then(|x| x.get(col)).copied()
     }
 
+    pub fn set(&mut self, pos: (usize, usize), val: char) {
+        if self.is_valid_coords(pos) {
+            self.map[pos.0][pos.1] = val;
+        }
+    }
+
     #[must_use]
     pub fn iter(&self) -> CharMapIterator {
         CharMapIterator::new(self)
