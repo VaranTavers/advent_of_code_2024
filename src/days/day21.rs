@@ -71,25 +71,8 @@ pub fn backtrack(
     }
 }
 
-const TRAVERSE_COST: [[usize; 5]; 5] = [
-    [0, 2, 2, 1, 1],
-    [2, 0, 2, 1, 3],
-    [2, 2, 0, 1, 1],
-    [1, 1, 1, 0, 2],
-    [1, 3, 1, 2, 0],
-];
-
-pub fn calculate_cost(dirs: &[To]) -> usize {
-    let mut sum = 0;
-    for (d1, d2) in dirs.iter().zip(dirs.iter().skip(1)) {
-        sum += TRAVERSE_COST[d1.to_index()][d2.to_index()];
-    }
-
-    sum
-}
-
 // Repurpose TO:TopLeft to pushing
-pub fn get_fastest_route_to_code(code: &str) -> Vec<To> {
+pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
     let mut res = Vec::new();
     let cmap: CharMap = NUM_PAD.into();
     //println!("{cmap}");
@@ -112,15 +95,7 @@ pub fn get_fastest_route_to_code(code: &str) -> Vec<To> {
     let mut nums = movements.iter().map(|_x| 0).collect();
     backtrack(0, &mut res, &movements, &mut nums);
 
-    let mut points = res
-        .iter()
-        .enumerate()
-        .map(|(i, x)| (calculate_cost(x), i))
-        .collect::<Vec<(usize, usize)>>();
-
-    points.sort();
-
-    res[points[0].1].clone()
+    res
 }
 
 pub fn get_fastest_route_to_path(code: &[char]) -> Vec<Vec<To>> {
@@ -169,10 +144,12 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let mut sum = 0;
     for line in reader.lines().map_while(Result::ok) {
         println!("{line}");
-        let dir_1 = tos_to_chars(&get_fastest_route_to_code(&line));
-        println!("{dir_1:?}");
-
-        let dirs_2 = vec![dir_1]
+        let dirs_1 = get_fastest_route_to_code(&line)
+            .iter()
+            .map(|x| tos_to_chars(x))
+            .collect::<Vec<Vec<char>>>();
+        println!("{dirs_1:?}");
+        let dirs_2 = dirs_1
             .iter()
             .map(|x| {
                 get_fastest_route_to_path(&x)
@@ -182,7 +159,7 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
             })
             .flatten()
             .collect::<Vec<Vec<char>>>();
-        println!("{dirs_2:?}");
+        //println!("{dirs_2:?}");
         let dirs_3 = dirs_2
             .iter()
             .map(|x| {
