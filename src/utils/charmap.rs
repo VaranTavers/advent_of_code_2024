@@ -2,6 +2,7 @@ use std::{
     fmt::Display,
     fs::File,
     io::{BufRead, BufReader},
+    str::FromStr,
 };
 
 #[derive(Debug, Clone)]
@@ -181,5 +182,24 @@ impl Iterator for CharMapIterator<'_> {
         }
 
         Some((self.row, self.col, self.cmap.map[self.row][self.col]))
+    }
+}
+
+impl FromStr for CharMap {
+    type Err = ();
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        let map = s
+            .split('\n')
+            .map(|line| line.chars().collect())
+            .collect::<Vec<Vec<char>>>();
+
+        Ok(CharMap { map })
+    }
+}
+
+impl Into<CharMap> for &str {
+    fn into(self) -> CharMap {
+        CharMap::from_str(self).unwrap()
     }
 }
