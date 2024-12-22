@@ -1,0 +1,62 @@
+1: [[1,  3,  3,  2,  2], [ 3, 1,  3,  2,  4], [ 3,  3, 1,  2,  2], [ 2,  2,  2, 1,  3], [ 2,  4,  2,  3, 1]]
+2: [[1,  9,  7,  6,  4], [ 7, 1,  5,  4,  8], [ 9,  9, 1,  8,  4], [ 4,  8,  4, 1,  7], [ 8, 10,  6,  9, 1]]
+3: [[1, 25, 17, 16, 10], [19, 1, 11, 10, 20], [21, 19, 1, 18, 12], [12, 18, 10, 1, 19], [18, 26, 16, 21, 1]]
+4: [[1, 59, 43, 40, 28], [47, 1, 29, 28, 48], [55, 47, 1, 46, 28], [28, 46, 28, 1, 47], [46, 60, 40, 55, 1]]
+
+
+1: 30 -> 74 -> 182 -> 
+
+480A
+30 * 480 = 14400
+143A
+28 * 143 = 4004
+983A
+28 * 983 = 27524
+382A
+28 * 382 = 10696
+974A
+30 * 974 = 29220
+
+480A
+74 * 480 = 35520
+143A
+72 * 143 = 10296
+983A
+66 * 983 = 64878
+382A
+68 * 382 = 25976
+974A
+72 * 974 = 70128
+
+480A
+182 * 480 = 87360
+143A
+176 * 143 = 25168
+983A
+160 * 983 = 157280
+382A
+168 * 382 = 64176
+974A
+172 * 974 = 167528
+
+480A
+444 * 480 = 213120
+143A
+442 * 143 = 63206
+983A
+398 * 983 = 391234
+382A
+424 * 382 = 161968
+974A
+422 * 974 = 411028
+
+
+85844
+206798
+501512 (2, 42)
+1240556 (2,473)
+
+
+TWO:[[(1, [TopLeft]), (25, [Bottom, Left, Left, TopLeft, Right, TopLeft, Top, Right, TopLeft, Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (17, [Bottom, Left, Left, TopLeft, Right, TopLeft, Top, Right, TopLeft, Bottom, TopLeft, Top, TopLeft, Left, TopLeft, Right, TopLeft]), (16, [Bottom, Left, Left, TopLeft, Right, TopLeft, Top, Right, TopLeft, Bottom, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (10, [Bottom, Left, TopLeft, Top, Right, TopLeft, Left, TopLeft, Right, TopLeft])], [(19, [Bottom, Left, TopLeft, Top, Right, TopLeft, Bottom, Left, Left, TopLeft, Right, Top, TopLeft, Right, TopLeft, Bottom, TopLeft, Top, TopLeft]), (1, [TopLeft]), (11, [Bottom, Left, TopLeft, Top, Right, TopLeft, TopLeft, Left, TopLeft, Right, TopLeft]), (10, [Bottom, Left, TopLeft, Top, Right, TopLeft, Left, TopLeft, Right, TopLeft]), (20, [Bottom, Left, TopLeft, Top, Right, TopLeft, TopLeft, Bottom, Left, Left, TopLeft, Right, Top, TopLeft, Right, TopLeft, Bottom, TopLeft, Top, TopLeft])], [(21, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, Left, Top, TopLeft, Right, TopLeft, Bottom, TopLeft, Top, TopLeft]), (19, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft, TopLeft, Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (1, [TopLeft]), (18, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (12, [Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, Top, TopLeft])], [(12, [Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, Top, TopLeft]), (18, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (10, [Bottom, Left, TopLeft, Top, Right, TopLeft, Left, TopLeft, Right, TopLeft]), (1, [TopLeft]), (19, [Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft, Bottom, Left, TopLeft, Right, TopLeft, Top, TopLeft, Left, TopLeft, Right, TopLeft])], [(18, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (26, [Bottom, Left, Left, TopLeft, Right, TopLeft, Top, Right, TopLeft, Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft, TopLeft, Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (16, [Bottom, Left, Left, TopLeft, Right, TopLeft, Top, Right, TopLeft, Bottom, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (21, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft, Bottom, TopLeft, Top, TopLeft, Bottom, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (1, [TopLeft])]]
+
+Day 21 (Part: 2): TWO:[[(1, [TopLeft]), (9, [Bottom, Left, TopLeft, Left, TopLeft, Right, Top, Right, TopLeft]), (7, [Bottom, Left, TopLeft, Right, TopLeft, Top, TopLeft]), (6, [Bottom, Left, TopLeft, Top, Right, TopLeft]), (4, [Bottom, TopLeft, Top, TopLeft])], [(7, [Bottom, TopLeft, Left, Top, TopLeft, Right, TopLeft]), (1, [TopLeft]), (5, [Bottom, TopLeft, TopLeft, Top, TopLeft]), (4, [Bottom, TopLeft, Top, TopLeft]), (8, [Bottom, TopLeft, TopLeft, Left, Top, TopLeft, Right, TopLeft])], [(9, [Bottom, Left, Left, TopLeft, Right, Top, TopLeft, Right, TopLeft]), (9, [Bottom, Left, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft]), (1, [TopLeft]), (8, [Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft]), (4, [Left, TopLeft, Right, TopLeft])], [(4, [Left, TopLeft, Right, TopLeft]), (8, [Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft]), (4, [Bottom, TopLeft, Top, TopLeft]), (1, [TopLeft]), (7, [Bottom, TopLeft, Left, Top, TopLeft, Right, TopLeft])], [(8, [Bottom, Left, Left, TopLeft, Right, Top, Right, TopLeft]), (10, [Bottom, Left, TopLeft, Left, TopLeft, TopLeft, Right, Top, Right, TopLeft]), (6, [Bottom, Left, TopLeft, Top, Right, TopLeft]), (9, [Bottom, Left, Left, TopLeft, Right, TopLeft, Top, Right, TopLeft]), (1, [TopLeft])]]

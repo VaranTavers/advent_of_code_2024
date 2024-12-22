@@ -4,17 +4,17 @@ use std::{
 };
 
 use crate::days::{
-    day1, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day2, day20,
-    day21, /*
-           day22, day23, day24, day25,       */
+    day1, day10, day11, day12, day13, day14, day15, day16, day17, day18, day19, day2, day20, day21,
+    day22, /*
+           day23, day24, day25,       */
     day3, day4, day5, day6, day7, day8, day9,
 };
 extern crate helper_lib;
 mod days;
 
 fn main() -> Result<(), io::Error> {
-    let day = 21;
-    let part = 1;
+    let day = 22;
+    let part = 2;
 
     let f = File::open(format!("inputs/input{day}.txt"))?;
     let reader = BufReader::new(f);
@@ -44,8 +44,8 @@ fn main() -> Result<(), io::Error> {
                 19 => println!("{}", day19::solution(reader).unwrap()),
                 20 => println!("{}", day20::solution(reader).unwrap()),
                 21 => println!("{}", day21::solution(reader).unwrap()),
-                /*22 => println!("{}", day22::solution(reader).unwrap()),
-                23 => println!("{}", day23::solution(reader).unwrap()),
+                22 => println!("{}", day22::solution(reader).unwrap()),
+                /*23 => println!("{}", day23::solution(reader).unwrap()),
                 24 => println!("{}", day24::solution(reader).unwrap()),
                 25 => println!("{}", day25::solution(reader).unwrap()),*/
                 _ => println!("What?"),
@@ -74,8 +74,8 @@ fn main() -> Result<(), io::Error> {
                 19 => println!("{}", day19::solution2(reader).unwrap()),
                 20 => println!("{}", day20::solution2(reader).unwrap()),
                 21 => println!("{}", day21::solution2(reader).unwrap()),
-                /*22 => println!("{}", day22::solution_2(reader).unwrap()),
-                23 => println!("{}", day23::solution_2(reader).unwrap()),*/
+                22 => println!("{}", day22::solution2(reader).unwrap()),
+                /*23 => println!("{}", day23::solution_2(reader).unwrap()),*/
                 _ => println!("What?"),
             };
         }
