@@ -307,15 +307,15 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let mut sum = 0;
 
     //CALCULATION
-    let costs = get_costs_2(1, false);
+    let costs = get_costs_2(1, true);
     let costs_a = get_costs_2(1, false);
 
-    let costs_b = costs_a
-        .iter()
-        .map(|x| x.iter().map(|y| y.0).collect())
-        .collect::<Vec<Vec<usize>>>();
+    /*let costs_b = costs_a
+    .iter()
+    .map(|x| x.iter().map(|y| y.0).collect())
+    .collect::<Vec<Vec<usize>>>();*/
 
-    println!("TWO:{:?}", costs[4]);
+    //println!("TWO:{:?}", costs[4]);
     println!();
     println!("A:  {:?}", costs_a);
 
@@ -353,9 +353,24 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
         //println!("{dirs_1:?}");
 
         let num_val = line.replace("A", "").parse::<usize>().unwrap();
+        // TRANSFORM WITH COST
+        /*let dirs_transformed: Vec<Vec<To>> = dirs_1
+        .iter()
+        .map(|x| {
+            let mut vec = x
+                .windows(2)
+                .map(|x| costs[x[0].to_index()][x[1].to_index()].1.clone())
+                .flatten()
+                .collect::<Vec<To>>();
+            //vec.insert(0, To::TopLeft);
+
+            vec
+        })
+        .collect();
+        println!("{dirs_transformed:?}");*/
         let shortest = dirs_1
             .iter()
-            .map(|x| calculate_num(1, &costs_a, x))
+            .map(|x| calculate_num(3, &costs_a, x))
             .min()
             .unwrap();
         println!("{} * {} = {}", shortest, num_val, shortest * num_val);
