@@ -5,6 +5,16 @@ use std::{
     io::{BufRead, BufReader},
 };
 
+const LOG: bool = true;
+
+macro_rules! log {
+    ($($x:tt)*) => { if LOG { print!($($x)*) } }
+}
+
+macro_rules! logln {
+    ($($x:tt)*) => { if LOG { println!($($x)*) } }
+}
+
 use helper_lib::utils::{CharMap, To};
 
 const NUM_PAD: &str = r#"789
@@ -23,15 +33,15 @@ pub fn dijkstra(cmap: &CharMap, start: (usize, usize), end: (usize, usize)) -> V
 
     while !points.is_empty() {
         let (c_val, c_pos, prev) = points.pop().unwrap();
-        //println!("{prev:?}");
+        //logln!("{prev:?}");
         if !res.is_empty() && res[0].len() < c_val.0 {
-            //println!("BREAK: {:?} {c_val:?} {:?}", res, prev);
-            //println!("{:?}", points);
+            //logln!("BREAK: {:?} {c_val:?} {:?}", res, prev);
+            //logln!("{:?}", points);
             break;
         }
         if c_pos == end {
             if res.is_empty() || res[0].len() == c_val.0 {
-                //println!("YES: {} {}", res.len(), c_val.0);
+                //logln!("YES: {} {}", res.len(), c_val.0);
                 res.push(prev);
             }
         } else {
@@ -57,7 +67,7 @@ pub fn backtrack(
     nums: &mut Vec<usize>,
 ) {
     if options.len() == 0 {
-        //println!("Baj van!");
+        //logln!("Baj van!");
         return;
     }
     if k == options.len() {
@@ -79,7 +89,7 @@ pub fn backtrack(
 pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
     let mut res = Vec::new();
     let cmap: CharMap = NUM_PAD.into();
-    //println!("{cmap}");
+    //logln!("{cmap}");
 
     let mut chars: Vec<char> = code.chars().collect();
     chars.insert(0, 'A');
@@ -94,7 +104,7 @@ pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
         movements.push(dirs);
     }
 
-    //println!("{movements:?}");
+    //logln!("{movements:?}");
 
     let mut nums = movements.iter().map(|_x| 0).collect();
     backtrack(0, &mut res, &movements, &mut nums);
@@ -105,7 +115,7 @@ pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
 pub fn get_fastest_route_to_path(code: &[char], add_a: bool) -> Vec<Vec<To>> {
     let mut res = Vec::new();
     let cmap: CharMap = WAY_PAD.into();
-    //println!("{cmap}");
+    //logln!("{cmap}");
 
     let mut chars: Vec<char> = code.iter().cloned().collect();
     if add_a {
@@ -118,19 +128,19 @@ pub fn get_fastest_route_to_path(code: &[char], add_a: bool) -> Vec<Vec<To>> {
 
     let mut movements: Vec<Vec<Vec<To>>> = Vec::new();
 
-    //println!("{chars:?}");
+    //logln!("{chars:?}");
     for (a, b) in chars.iter().zip(chars.iter().skip(1)) {
         let start_pos = cmap.find_first(*a).unwrap();
         let end_pos = cmap.find_first(*b).unwrap();
 
         let dirs = dijkstra(&cmap, start_pos, end_pos);
-        //println!("{dirs:?}");
+        //logln!("{dirs:?}");
         movements.push(dirs);
     }
 
     let mut nums = movements.iter().map(|_x| 0).collect();
     backtrack(0, &mut res, &movements, &mut nums);
-    //println!("REEESS: {res:?}");
+    //logln!("REEESS: {res:?}");
     res
 }
 
@@ -154,7 +164,7 @@ pub fn tos_to_chars(vals: &[To]) -> Vec<char> {
 pub fn run_calculation(dirs: &[To], k: usize) -> usize {
     let mut dirs_chars = vec![tos_to_chars(dirs)];
 
-    //println!("0: {dirs_chars:?}");
+    //logln!("0: {dirs_chars:?}");
     for i in 0..k {
         let dirs_2 = dirs_chars
             .iter()
@@ -168,7 +178,7 @@ pub fn run_calculation(dirs: &[To], k: usize) -> usize {
             .collect::<Vec<Vec<char>>>();
         dirs_chars = dirs_2;
 
-        //println!("{}: {dirs_chars:?}", i + 1);
+        //logln!("{}: {dirs_chars:?}", i + 1);
     }
     let shortest = dirs_chars.iter().map(|x| x.len()).min().unwrap();
 
@@ -191,7 +201,10 @@ pub fn get_costs(k: usize) -> Vec<Vec<usize>> {
 pub fn get_single_cost(dirs: &[To], costs: &[Vec<usize>]) -> usize {
     let mut sum = 0;
     sum += costs[4][dirs[0].to_index()];
+    logln!("");
+    logln!("{sum} (TopLeft {:?})", dirs[0]);
     for (a, b) in dirs.iter().zip(dirs.iter().skip(1)) {
+        logln!("+ {} ({a:?} {b:?})", costs[a.to_index()][b.to_index()]);
         sum += costs[a.to_index()][b.to_index()];
     }
     sum
@@ -199,12 +212,12 @@ pub fn get_single_cost(dirs: &[To], costs: &[Vec<usize>]) -> usize {
 
 pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let mut sum = 0;
-    let costs = get_costs(2);
-    //println!("{costs:?}");
+    let costs = get_costs(3);
+    //logln!("{costs:?}");
     for line in reader.lines().map_while(Result::ok) {
-        //println!("{line}");
+        //logln!("{line}");
         let dirs_1 = get_fastest_route_to_code(&line);
-        //println!("{dirs_1:?}");
+        //logln!("{dirs_1:?}");
 
         let num_val = line.replace("A", "").parse::<usize>().unwrap();
         let shortest = dirs_1
@@ -212,13 +225,16 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
             .map(|x| get_single_cost(x, &costs))
             .min()
             .unwrap();
-        //println!("{} * {} = {}", shortest, num_val, shortest * num_val);
+        logln!("{} * {} = {}", shortest, num_val, shortest * num_val);
         sum += shortest * num_val;
     }
     Ok(sum)
 }
 
 /* SOLUTION 2 */
+
+// Some inspiration might be taken from: https://www.reddit.com/r/adventofcode/comments/1hj8380/2024_day_21_part_2_i_need_help_three_days_in_row/
+// however, i did not understand the how, so that is custom
 
 pub fn calc_short(vec: &[To]) -> usize {
     let mut s = vec.len() * 100;
@@ -234,7 +250,7 @@ pub fn calc_short(vec: &[To]) -> usize {
 pub fn run_calculation_2(dirs_orig: &[To], k: usize, from_a: bool) -> (usize, Vec<To>) {
     let mut dirs = vec![dirs_orig.to_vec()];
 
-    //println!("0: {dirs_chars:?}");
+    //logln!("0: {dirs_chars:?}");
     for i in 0..k {
         let dirs_chars = dirs
             .iter()
@@ -247,15 +263,15 @@ pub fn run_calculation_2(dirs_orig: &[To], k: usize, from_a: bool) -> (usize, Ve
             .collect::<Vec<Vec<To>>>();
         dirs = dirs_2;
 
-        //println!("{}: {dirs_chars:?}", i + 1);
+        //logln!("{}: {dirs_chars:?}", i + 1);
     }
     /*if dirs_orig[0] == To::TopLeft && dirs_orig[1] == To::Top {
-        println!("dirs: {:?}", dirs);
+        logln!("dirs: {:?}", dirs);
         let vals = dirs
             .iter()
             .map(|x| (calc_short(x), x.clone()))
             .collect::<Vec<(usize, Vec<To>)>>();
-        println!("vals: {:?}", vals);
+        logln!("vals: {:?}", vals);
     }*/
     let mut shortest = dirs
         .iter()
@@ -281,8 +297,16 @@ pub fn get_costs_2(k: usize, from_a: bool) -> Vec<Vec<(usize, Vec<To>)>> {
     res
 }
 
-pub fn calculate_num(k: usize, vecs: &[Vec<(usize, Vec<To>)>], vec: &[To]) -> usize {
+pub fn calculate_num(
+    k: usize,
+    vecs: &[Vec<(usize, Vec<To>)>],
+    all_costs: &mut [Vec<Vec<Option<usize>>>],
+    vec: &[To],
+) -> usize {
     let mut s = 0;
+
+    let level = "\t".repeat(k);
+    logln!("{level} Working on {vec:?}");
 
     for (i, val) in vec.iter().enumerate() {
         if k == 1 {
@@ -293,12 +317,37 @@ pub fn calculate_num(k: usize, vecs: &[Vec<(usize, Vec<To>)>], vec: &[To]) -> us
             }
         } else {
             if i == 0 {
-                s += calculate_num(k - 1, vecs, &vecs[4][val.to_index()].1)
+                logln!("{level} Working on first value {val:?}");
+                if let Some(x) = all_costs[k][4][val.to_index()] {
+                    logln!("Cached: {}", x);
+                    s += x;
+                } else {
+                    let res = calculate_num(k - 1, vecs, all_costs, &vecs[4][val.to_index()].1);
+                    all_costs[k][4][val.to_index()] = Some(res);
+                    s += res;
+                }
             } else {
-                s += calculate_num(k - 1, vecs, &vecs[vec[i - 1].to_index()][val.to_index()].1)
+                logln!(
+                    "{level} Working on not first value {:?} -> {val:?}",
+                    vec[i - 1]
+                );
+                if let Some(x) = all_costs[k][vec[i - 1].to_index()][val.to_index()] {
+                    logln!("Cached: {}", x);
+                    s += x;
+                } else {
+                    let res = calculate_num(
+                        k - 1,
+                        vecs,
+                        all_costs,
+                        &vecs[vec[i - 1].to_index()][val.to_index()].1,
+                    );
+                    all_costs[k][vec[i - 1].to_index()][val.to_index()] = Some(res);
+                    s += res;
+                }
             }
         }
     }
+    logln!("{level} Returning: {s}");
 
     s
 }
@@ -307,73 +356,49 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let mut sum = 0;
 
     //CALCULATION
-    let costs = get_costs_2(1, true);
-    let costs_a = get_costs_2(1, false);
+    let mut costs = get_costs_2(1, false);
+    costs[4][To::Bottom.to_index()] = (3, vec![To::Left, To::Bottom, To::TopLeft]);
+    logln!("{costs:?}");
+    let mut all_costs: Vec<Vec<Vec<Option<usize>>>> = vec![vec![vec![None; 5]; 5]; 26];
 
-    /*let costs_b = costs_a
-    .iter()
-    .map(|x| x.iter().map(|y| y.0).collect())
-    .collect::<Vec<Vec<usize>>>();*/
-
-    //println!("TWO:{:?}", costs[4]);
-    println!();
-    println!("A:  {:?}", costs_a);
-
-    /*    //println!("{}", calculate_num(1, &costs_a, &costs[0][1].1));
-        let mut res = vec![vec![10000; 5]; 5];
-        for i in 0..5 {
-            for j in 0..5 {
-                res[i][j] = calculate_num(20, &costs_a, &costs[i][j].1);
-                println!("{i} {j} {}", res[i][j]);
-            }
+    for (i, v) in costs.iter().enumerate() {
+        for (j, val) in v.iter().enumerate() {
+            all_costs[1][i][j] = Some(val.0);
         }
-    */
-    /*
-    // RESULTS 25
-    let costs: Vec<Vec<usize>> = vec![
-        vec![1, 17411466119, 13075741541, 11948123406, 8135210660],
-        vec![14541180821, 1, 8135210661, 8135210660, 14541180822],
-        vec![15960515423, 12661998643, 1, 12661998642, 8437063956],
-        vec![8437063956, 12661998642, 8135210660, 1, 13591086449],
-        vec![12661998642, 17411466120, 11948123406, 15635719885, 1],
-    ];
+    }
 
-    // RESULTS 24
-    let costs: Vec<Vec<usize>> = vec![
-        vec![1, 6882163277, 5168398097, 4722688758, 3215573368],
-        vec![5747636461, 1, 3215573369, 3215573368, 5747636462],
-        vec![6308651143, 5004859249, 1, 5004859248, 3334885690],
-        vec![3334885690, 5004859248, 3215573368, 1, 5372096411],
-        vec![5004859248, 6882163278, 4722688758, 6180270419, 1],
-    ];
-    println!("{costs:?}");*/
     for line in reader.lines().map_while(Result::ok) {
-        println!("{line}");
+        logln!("{line}");
         let dirs_1 = get_fastest_route_to_code(&line);
-        //println!("{dirs_1:?}");
+        logln!("{dirs_1:?}");
 
-        let num_val = line.replace("A", "").parse::<usize>().unwrap();
-        // TRANSFORM WITH COST
-        /*let dirs_transformed: Vec<Vec<To>> = dirs_1
-        .iter()
-        .map(|x| {
-            let mut vec = x
-                .windows(2)
-                .map(|x| costs[x[0].to_index()][x[1].to_index()].1.clone())
-                .flatten()
-                .collect::<Vec<To>>();
-            //vec.insert(0, To::TopLeft);
-
-            vec
-        })
-        .collect();
-        println!("{dirs_transformed:?}");*/
-        let shortest = dirs_1
+        let dirs_transformed: Vec<Vec<To>> = dirs_1
             .iter()
-            .map(|x| calculate_num(3, &costs_a, x))
+            .map(|x| {
+                let mut vec = costs[4][x[0].to_index()].1.clone();
+
+                let mut vec2 = x
+                    .windows(2)
+                    .map(|x| costs[x[0].to_index()][x[1].to_index()].1.clone())
+                    .flatten()
+                    .collect::<Vec<To>>();
+                vec.append(&mut vec2);
+
+                vec
+            })
+            .collect();
+        logln!("{dirs_transformed:?}");
+
+        let shortest = dirs_transformed
+            .iter()
+            .map(|x| calculate_num(24, &costs, &mut all_costs, x))
             .min()
             .unwrap();
-        println!("{} * {} = {}", shortest, num_val, shortest * num_val);
+
+        let num_val = line.replace("A", "").parse::<usize>().unwrap();
+
+        logln!("{} * {} = {}", shortest, num_val, shortest * num_val);
+
         sum += shortest * num_val;
     }
 
