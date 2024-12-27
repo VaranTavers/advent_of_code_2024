@@ -5,31 +5,24 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-const LOG: bool = true;
+const LOG: bool = false;
+use helper_lib::logln;
 
-macro_rules! log {
-    ($($x:tt)*) => { if LOG { print!($($x)*) } }
-}
+use helper_lib::utils::{CharMap, Direction};
 
-macro_rules! logln {
-    ($($x:tt)*) => { if LOG { println!($($x)*) } }
-}
-
-use helper_lib::utils::{CharMap, To};
-
-const NUM_PAD: &str = r#"789
+const NUM_PAD: &str = r"789
 456
 123
-.0A"#;
+.0A";
 
-const WAY_PAD: &str = r#".^A
-<v>"#;
+const WAY_PAD: &str = r".^A
+<v>";
 
-pub fn dijkstra(cmap: &CharMap, start: (usize, usize), end: (usize, usize)) -> Vec<Vec<To>> {
+pub fn dijkstra(cmap: &CharMap, start: (usize, usize), end: (usize, usize)) -> Vec<Vec<Direction>> {
     let mut points = BinaryHeap::new();
     points.push((Reverse(0), start, Vec::new()));
 
-    let mut res: Vec<Vec<To>> = Vec::new();
+    let mut res: Vec<Vec<Direction>> = Vec::new();
 
     while !points.is_empty() {
         let (c_val, c_pos, prev) = points.pop().unwrap();
@@ -45,7 +38,7 @@ pub fn dijkstra(cmap: &CharMap, start: (usize, usize), end: (usize, usize)) -> V
                 res.push(prev);
             }
         } else {
-            for n_dir in To::cardinal_directions() {
+            for n_dir in Direction::cardinal_directions() {
                 if let Some(next_pos) = n_dir.move_to(c_pos) {
                     if cmap.is_valid_coords(next_pos) && cmap.get(next_pos) != Some('.') {
                         let mut prev_copy = prev.clone();
@@ -62,8 +55,8 @@ pub fn dijkstra(cmap: &CharMap, start: (usize, usize), end: (usize, usize)) -> V
 
 pub fn backtrack(
     k: usize,
-    res: &mut Vec<Vec<To>>,
-    options: &[Vec<Vec<To>>],
+    res: &mut Vec<Vec<Direction>>,
+    options: &[Vec<Vec<Direction>>],
     nums: &mut Vec<usize>,
 ) {
     if options.len() == 0 {
@@ -74,7 +67,7 @@ pub fn backtrack(
         let mut res_l = Vec::new();
         for (i, x) in nums.iter().enumerate() {
             res_l.append(&mut options[i][*x].clone());
-            res_l.push(To::TopLeft);
+            res_l.push(Direction::TopLeft);
         }
         res.push(res_l);
         return;
@@ -86,7 +79,7 @@ pub fn backtrack(
 }
 
 // Repurpose TO:TopLeft to pushing
-pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
+pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<Direction>> {
     let mut res = Vec::new();
     let cmap: CharMap = NUM_PAD.into();
     //logln!("{cmap}");
@@ -94,7 +87,7 @@ pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
     let mut chars: Vec<char> = code.chars().collect();
     chars.insert(0, 'A');
 
-    let mut movements: Vec<Vec<Vec<To>>> = Vec::new();
+    let mut movements: Vec<Vec<Vec<Direction>>> = Vec::new();
 
     for (a, b) in chars.iter().zip(chars.iter().skip(1)) {
         let start_pos = cmap.find_first(*a).unwrap();
@@ -112,21 +105,21 @@ pub fn get_fastest_route_to_code(code: &str) -> Vec<Vec<To>> {
     res
 }
 
-pub fn get_fastest_route_to_path(code: &[char], add_a: bool) -> Vec<Vec<To>> {
+pub fn get_fastest_route_to_path(code: &[char], add_a: bool) -> Vec<Vec<Direction>> {
     let mut res = Vec::new();
     let cmap: CharMap = WAY_PAD.into();
     //logln!("{cmap}");
 
-    let mut chars: Vec<char> = code.iter().cloned().collect();
+    let mut chars: Vec<char> = code.iter().copied().collect();
     if add_a {
         chars.insert(0, 'A');
     }
 
     if code.len() == 1 {
-        return vec![vec![To::TopLeft]];
+        return vec![vec![Direction::TopLeft]];
     }
 
-    let mut movements: Vec<Vec<Vec<To>>> = Vec::new();
+    let mut movements: Vec<Vec<Vec<Direction>>> = Vec::new();
 
     //logln!("{chars:?}");
     for (a, b) in chars.iter().zip(chars.iter().skip(1)) {
@@ -144,51 +137,50 @@ pub fn get_fastest_route_to_path(code: &[char], add_a: bool) -> Vec<Vec<To>> {
     res
 }
 
-pub fn to_to_char(to: &To) -> char {
+pub fn to_to_char(to: &Direction) -> char {
     match to {
-        To::Bottom => 'v',
-        To::Left => '<',
-        To::Top => '^',
-        To::Right => '>',
-        To::TopRight => '?',
-        To::TopLeft => 'A',
-        To::BottomRight => '?',
-        To::BottomLeft => '?',
+        Direction::Bottom => 'v',
+        Direction::Left => '<',
+        Direction::Top => '^',
+        Direction::Right => '>',
+        Direction::TopRight => '?',
+        Direction::TopLeft => 'A',
+        Direction::BottomRight => '?',
+        Direction::BottomLeft => '?',
     }
 }
 
-pub fn tos_to_chars(vals: &[To]) -> Vec<char> {
+pub fn tos_to_chars(vals: &[Direction]) -> Vec<char> {
     vals.iter().map(to_to_char).collect()
 }
 
-pub fn run_calculation(dirs: &[To], k: usize) -> usize {
+pub fn run_calculation(dirs: &[Direction], k: usize) -> usize {
     let mut dirs_chars = vec![tos_to_chars(dirs)];
 
     //logln!("0: {dirs_chars:?}");
     for i in 0..k {
         let dirs_2 = dirs_chars
             .iter()
-            .map(|x| {
-                get_fastest_route_to_path(&x, i != 0)
+            .flat_map(|x| {
+                get_fastest_route_to_path(x, i != 0)
                     .iter()
                     .map(|x| tos_to_chars(x))
                     .collect::<Vec<Vec<char>>>()
             })
-            .flatten()
             .collect::<Vec<Vec<char>>>();
         dirs_chars = dirs_2;
 
         //logln!("{}: {dirs_chars:?}", i + 1);
     }
-    let shortest = dirs_chars.iter().map(|x| x.len()).min().unwrap();
+    let shortest = dirs_chars.iter().map(Vec::len).min().unwrap();
 
     shortest
 }
 
 pub fn get_costs(k: usize) -> Vec<Vec<usize>> {
     let mut res = vec![vec![10000; 5]; 5];
-    let mut dirs = To::cardinal_directions().to_vec();
-    dirs.push(To::TopLeft);
+    let mut dirs = Direction::cardinal_directions().to_vec();
+    dirs.push(Direction::TopLeft);
     for a in &dirs {
         for b in &dirs {
             res[a.to_index()][b.to_index()] = run_calculation(&[*a, *b], k);
@@ -198,7 +190,7 @@ pub fn get_costs(k: usize) -> Vec<Vec<usize>> {
     res
 }
 
-pub fn get_single_cost(dirs: &[To], costs: &[Vec<usize>]) -> usize {
+pub fn get_single_cost(dirs: &[Direction], costs: &[Vec<usize>]) -> usize {
     let mut sum = 0;
     sum += costs[4][dirs[0].to_index()];
     logln!("");
@@ -219,7 +211,7 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
         let dirs_1 = get_fastest_route_to_code(&line);
         //logln!("{dirs_1:?}");
 
-        let num_val = line.replace("A", "").parse::<usize>().unwrap();
+        let num_val = line.replace('A', "").parse::<usize>().unwrap();
         let shortest = dirs_1
             .iter()
             .map(|x| get_single_cost(x, &costs))
@@ -236,7 +228,7 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
 // Some inspiration might be taken from: https://www.reddit.com/r/adventofcode/comments/1hj8380/2024_day_21_part_2_i_need_help_three_days_in_row/
 // however, i did not understand the how, so that is custom
 
-pub fn calc_short(vec: &[To]) -> usize {
+pub fn calc_short(vec: &[Direction]) -> usize {
     let mut s = vec.len() * 100;
     for (a, b) in vec.iter().zip(vec.iter().skip(1)) {
         if a != b {
@@ -247,7 +239,11 @@ pub fn calc_short(vec: &[To]) -> usize {
     s
 }
 
-pub fn run_calculation_2(dirs_orig: &[To], k: usize, from_a: bool) -> (usize, Vec<To>) {
+pub fn run_calculation_2(
+    dirs_orig: &[Direction],
+    k: usize,
+    from_a: bool,
+) -> (usize, Vec<Direction>) {
     let mut dirs = vec![dirs_orig.to_vec()];
 
     //logln!("0: {dirs_chars:?}");
@@ -258,9 +254,8 @@ pub fn run_calculation_2(dirs_orig: &[To], k: usize, from_a: bool) -> (usize, Ve
             .collect::<Vec<Vec<char>>>();
         let dirs_2 = dirs_chars
             .iter()
-            .map(|x| get_fastest_route_to_path(&x, from_a || i != 0))
-            .flatten()
-            .collect::<Vec<Vec<To>>>();
+            .flat_map(|x| get_fastest_route_to_path(x, from_a || i != 0))
+            .collect::<Vec<Vec<Direction>>>();
         dirs = dirs_2;
 
         //logln!("{}: {dirs_chars:?}", i + 1);
@@ -284,10 +279,10 @@ pub fn run_calculation_2(dirs_orig: &[To], k: usize, from_a: bool) -> (usize, Ve
     shortest
 }
 
-pub fn get_costs_2(k: usize, from_a: bool) -> Vec<Vec<(usize, Vec<To>)>> {
+pub fn get_costs_2(k: usize, from_a: bool) -> Vec<Vec<(usize, Vec<Direction>)>> {
     let mut res = vec![vec![(10000, Vec::new()); 5]; 5];
-    let mut dirs = To::cardinal_directions().to_vec();
-    dirs.push(To::TopLeft);
+    let mut dirs = Direction::cardinal_directions().to_vec();
+    dirs.push(Direction::TopLeft);
     for a in &dirs {
         for b in &dirs {
             res[a.to_index()][b.to_index()] = run_calculation_2(&[*a, *b], k, from_a);
@@ -299,9 +294,9 @@ pub fn get_costs_2(k: usize, from_a: bool) -> Vec<Vec<(usize, Vec<To>)>> {
 
 pub fn calculate_num(
     k: usize,
-    vecs: &[Vec<(usize, Vec<To>)>],
+    vecs: &[Vec<(usize, Vec<Direction>)>],
     all_costs: &mut [Vec<Vec<Option<usize>>>],
-    vec: &[To],
+    vec: &[Direction],
 ) -> usize {
     let mut s = 0;
 
@@ -315,35 +310,33 @@ pub fn calculate_num(
             } else {
                 s += vecs[vec[i - 1].to_index()][val.to_index()].0;
             }
-        } else {
-            if i == 0 {
-                logln!("{level} Working on first value {val:?}");
-                if let Some(x) = all_costs[k][4][val.to_index()] {
-                    logln!("Cached: {}", x);
-                    s += x;
-                } else {
-                    let res = calculate_num(k - 1, vecs, all_costs, &vecs[4][val.to_index()].1);
-                    all_costs[k][4][val.to_index()] = Some(res);
-                    s += res;
-                }
+        } else if i == 0 {
+            logln!("{level} Working on first value {val:?}");
+            if let Some(x) = all_costs[k][4][val.to_index()] {
+                logln!("Cached: {}", x);
+                s += x;
             } else {
-                logln!(
-                    "{level} Working on not first value {:?} -> {val:?}",
-                    vec[i - 1]
+                let res = calculate_num(k - 1, vecs, all_costs, &vecs[4][val.to_index()].1);
+                all_costs[k][4][val.to_index()] = Some(res);
+                s += res;
+            }
+        } else {
+            logln!(
+                "{level} Working on not first value {:?} -> {val:?}",
+                vec[i - 1]
+            );
+            if let Some(x) = all_costs[k][vec[i - 1].to_index()][val.to_index()] {
+                logln!("Cached: {}", x);
+                s += x;
+            } else {
+                let res = calculate_num(
+                    k - 1,
+                    vecs,
+                    all_costs,
+                    &vecs[vec[i - 1].to_index()][val.to_index()].1,
                 );
-                if let Some(x) = all_costs[k][vec[i - 1].to_index()][val.to_index()] {
-                    logln!("Cached: {}", x);
-                    s += x;
-                } else {
-                    let res = calculate_num(
-                        k - 1,
-                        vecs,
-                        all_costs,
-                        &vecs[vec[i - 1].to_index()][val.to_index()].1,
-                    );
-                    all_costs[k][vec[i - 1].to_index()][val.to_index()] = Some(res);
-                    s += res;
-                }
+                all_costs[k][vec[i - 1].to_index()][val.to_index()] = Some(res);
+                s += res;
             }
         }
     }
@@ -357,7 +350,10 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
 
     //CALCULATION
     let mut costs = get_costs_2(1, false);
-    costs[4][To::Bottom.to_index()] = (3, vec![To::Left, To::Bottom, To::TopLeft]);
+    costs[4][Direction::Bottom.to_index()] = (
+        3,
+        vec![Direction::Left, Direction::Bottom, Direction::TopLeft],
+    );
     logln!("{costs:?}");
     let mut all_costs: Vec<Vec<Vec<Option<usize>>>> = vec![vec![vec![None; 5]; 5]; 26];
 
@@ -372,7 +368,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
         let dirs_1 = get_fastest_route_to_code(&line);
         logln!("{dirs_1:?}");
 
-        let dirs_transformed: Vec<Vec<To>> = dirs_1
+        let dirs_transformed: Vec<Vec<Direction>> = dirs_1
             .iter()
             .map(|x| {
                 let mut vec = costs[4][x[0].to_index()].1.clone();
@@ -381,7 +377,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
                     .windows(2)
                     .map(|x| costs[x[0].to_index()][x[1].to_index()].1.clone())
                     .flatten()
-                    .collect::<Vec<To>>();
+                    .collect::<Vec<Direction>>();
                 vec.append(&mut vec2);
 
                 vec
@@ -395,7 +391,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
             .min()
             .unwrap();
 
-        let num_val = line.replace("A", "").parse::<usize>().unwrap();
+        let num_val = line.replace('A', "").parse::<usize>().unwrap();
 
         logln!("{} * {} = {}", shortest, num_val, shortest * num_val);
 

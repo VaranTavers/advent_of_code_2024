@@ -1,10 +1,10 @@
 use std::{fs::File, io::BufReader};
 
-use crate::helper_lib::utils::{CharMap, To};
+use crate::helper_lib::utils::{CharMap, Direction};
 
 const WORD: &str = "XMAS";
 
-pub fn check_xmas(cmap: &CharMap, p: (usize, usize), dir: To) -> i64 {
+pub fn check_xmas(cmap: &CharMap, p: (usize, usize), dir: Direction) -> i64 {
     let mut p = p;
     let mut opt_p = Some(p);
     for c in WORD.chars() {
@@ -23,7 +23,7 @@ pub fn check_xmas(cmap: &CharMap, p: (usize, usize), dir: To) -> i64 {
 }
 
 pub fn check_xmas_all(cmap: &CharMap, p: (usize, usize)) -> i64 {
-    let dirs = To::all_directions();
+    let dirs = Direction::all_directions();
 
     dirs.iter().map(|dir| check_xmas(cmap, p, *dir)).sum()
 }
@@ -54,7 +54,7 @@ pub fn is_x_mas(cmap: &CharMap, p: (usize, usize)) -> bool {
         }
     }
 
-    let ps = To::x_directions().map(|dir| dir.move_to(p));
+    let ps = Direction::x_directions().map(|dir| dir.move_to(p));
     if ps.iter().any(Option::is_none) {
         //println!("dir err");
         return false;

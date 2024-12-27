@@ -6,15 +6,8 @@ use std::{
     str::FromStr,
 };
 
-const LOG: bool = true;
-
-macro_rules! log {
-    ($($x:tt)*) => { if LOG { print!($($x)*) } }
-}
-
-macro_rules! logln {
-    ($($x:tt)*) => { if LOG { println!($($x)*) } }
-}
+const LOG: bool = false;
+use helper_lib::{log, logln};
 
 pub fn calculate_result(hmap: &HashMap<String, Option<bool>>, c: char) -> usize {
     let mut zs: Vec<&String> = hmap.keys().filter(|x| x.starts_with(c)).collect();
@@ -23,7 +16,7 @@ pub fn calculate_result(hmap: &HashMap<String, Option<bool>>, c: char) -> usize 
     logln!("{zs:?}");
     let mut p = 1;
     let mut res = 0;
-    for key in zs.iter() {
+    for key in &zs {
         if hmap[*key].unwrap() {
             log!("{p} +");
             res += p;
@@ -81,7 +74,7 @@ impl FromStr for Operation {
 }
 
 impl Operation {
-    pub fn apply(&self, a1: bool, a2: bool) -> bool {
+    pub fn apply(self, a1: bool, a2: bool) -> bool {
         match self {
             Operation::Xor => a1 ^ a2,
             Operation::Or => a1 || a2,
@@ -95,7 +88,7 @@ pub fn read_gate(line: &str) -> ((String, String), (Operation, String)) {
 
     let output = eq_sides.1.to_owned();
 
-    let l_parts = eq_sides.0.split(" ").collect::<Vec<&str>>();
+    let l_parts = eq_sides.0.split(' ').collect::<Vec<&str>>();
 
     (
         (l_parts[0].to_owned(), l_parts[2].to_owned()),
@@ -333,10 +326,8 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
                             format!("re{}", ZeroPadded(num)),
                             format!("ca{}", ZeroPadded(num - 1)),
                         );
-                    } else {
-                        if num != 45 {
-                            println!("We can only get a z by XOR-ing, however, we go one from: {in1} {op:?} {in2} -> {out}");
-                        }
+                    } else if num != 45 {
+                        println!("We can only get a z by XOR-ing, however, we go one from: {in1} {op:?} {in2} -> {out}");
                     }
                 }
             }

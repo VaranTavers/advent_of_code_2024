@@ -1,6 +1,6 @@
 use std::{fs::File, io::BufReader};
 
-use helper_lib::utils::{CharMap, To};
+use helper_lib::utils::{CharMap, Direction};
 
 pub fn get_region(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize, usize)>, usize) {
     let mut cmap = cmap.clone();
@@ -14,7 +14,7 @@ pub fn get_region(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize, 
         let p = points.pop().unwrap();
         if cmap.map[p.0][p.1] != '.' {
             cmap.map[p.0][p.1] = '.';
-            for dir in To::cardinal_directions() {
+            for dir in Direction::cardinal_directions() {
                 if let Some(next_p) = dir.move_to(p) {
                     if cmap.is_valid_coords(next_p) {
                         if cmap.get(next_p).unwrap() == c {
@@ -228,7 +228,7 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
         let p = points.pop().unwrap();
         if cmap.map[p.0][p.1] != '.' {
             cmap.map[p.0][p.1] = '.';
-            for dir in To::cardinal_directions() {
+            for dir in Direction::cardinal_directions() {
                 if let Some(next_p) = dir.move_to(p) {
                     if cmap.is_valid_coords(next_p) {
                         if cmap.get(next_p).unwrap() == c {
@@ -236,15 +236,15 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
                             points.push(next_p);
                             //println!("{next_p:?} PUSHED")
                         } else if cmap.get(next_p).unwrap() != '.' {
-                            if dir == To::Top {
+                            if dir == Direction::Top {
                                 horiz_lines[p.0][p.1] = true;
 
                                 //println!("{p:?} TOP");
-                            } else if dir == To::Left {
+                            } else if dir == Direction::Left {
                                 vert_lines[p.0][p.1] = true;
 
                                 //println!("{p:?} LEFT");
-                            } else if dir == To::Bottom {
+                            } else if dir == Direction::Bottom {
                                 horiz_lines[p.0 + 1][p.1] = true;
 
                                 //println!("{p:?} BOTTOM");
@@ -254,7 +254,7 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
                                 //println!("{p:?} RIGHT");
                             }
                         }
-                    } else if dir == To::Bottom {
+                    } else if dir == Direction::Bottom {
                         horiz_lines[p.0 + 1][p.1] = true;
 
                         //println!("{p:?} BOTTOM_MAP");
@@ -263,7 +263,7 @@ pub fn get_region_2(cmap: &CharMap, (i, j): (usize, usize)) -> (char, Vec<(usize
 
                         //println!("{p:?} RIGHT_MAP");
                     }
-                } else if dir == To::Top {
+                } else if dir == Direction::Top {
                     horiz_lines[p.0][p.1] = true;
                     //println!("{p:?} TOP_MAP");
                 } else {

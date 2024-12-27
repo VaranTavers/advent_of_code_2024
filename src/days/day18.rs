@@ -5,7 +5,7 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-use helper_lib::utils::{CharMap, To};
+use helper_lib::utils::{CharMap, Direction};
 
 const SIZE: usize = 71; // 71
 
@@ -25,7 +25,7 @@ pub fn get_path(pos: (usize, usize), prev: &[Vec<Option<(usize, usize)>>]) -> Ve
 
 pub fn dijkstra(cmap: &CharMap, pos: (usize, usize)) -> (Vec<(usize, usize)>, usize) {
     let mut points = BinaryHeap::new();
-    points.push((Reverse(0), pos, To::Right));
+    points.push((Reverse(0), pos, Direction::Right));
     let mut visited = cmap.map_to_val(false);
     visited[pos.0][pos.1] = true;
     let mut prev: Vec<Vec<Option<(usize, usize)>>> = cmap.map_to_val(None);

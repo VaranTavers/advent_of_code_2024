@@ -22,24 +22,24 @@ pub fn graph_alg(part: &[char], match_indices: &[(usize, usize)]) -> bool {
         points[*s] |= points[*s + *l];
     }
     //println!("{points:?}");
-    return points[0];
+    points[0]
 }
 
 pub fn is_valid(part: &str, set: &[(String, usize)]) -> bool {
     let mut match_indices = Vec::new();
 
     //println!("{set:?}");
-    for (reg, len) in set.iter() {
+    for (reg, len) in set {
         for val in part.match_indices(reg) {
             match_indices.push((val.0, *len));
         }
     }
 
-    match_indices.sort();
+    match_indices.sort_unstable();
     //println!("{match_indices:?}");
 
     let chars = part.chars().collect::<Vec<char>>();
-    return graph_alg(&chars, &match_indices);
+    graph_alg(&chars, &match_indices)
 }
 
 pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
@@ -68,7 +68,7 @@ pub fn graph_alg2(part: &[char], match_indices: &[(usize, usize)]) -> u128 {
         points[*s] += points[*s + *l];
     }
     println!("{points:?}");
-    return points[0];
+    points[0]
 }
 
 // Some help was required in order to realize that match_indices doesn't handle the "brbrbr" case well if you are searching for "brbr"
@@ -86,10 +86,10 @@ pub fn is_valid2(part: &str, set: &[(String, usize)]) -> u128 {
         }
     }
 
-    match_indices.sort();
+    match_indices.sort_unstable();
     //println!("{match_indices:?}");
 
-    return graph_alg2(&chars, &match_indices);
+    graph_alg2(&chars, &match_indices)
 }
 
 pub fn solution2(reader: BufReader<File>) -> Result<u128, std::io::Error> {

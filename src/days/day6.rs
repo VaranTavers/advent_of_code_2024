@@ -1,12 +1,12 @@
 use std::{fs::File, io::BufReader};
 
-use crate::helper_lib::utils::{CharMap, To};
+use crate::helper_lib::utils::{CharMap, Direction};
 
 pub fn get_next_position_and_dir(
     cmap: &CharMap,
     position: (usize, usize),
-    direction: To,
-) -> Option<((usize, usize), To)> {
+    direction: Direction,
+) -> Option<((usize, usize), Direction)> {
     let mut direction = direction;
     let next_pos = direction.move_to(position);
     if next_pos.is_none() || !cmap.is_valid_coords(next_pos.unwrap()) {
@@ -34,11 +34,11 @@ pub fn get_next_position_and_dir(
     Some((next_pos, direction))
 }
 
-pub fn generate_visited_dir(cmap: &CharMap) -> Vec<Vec<Option<To>>> {
-    let mut visited_dir: Vec<Vec<Option<To>>> = cmap.map_to_val(None);
+pub fn generate_visited_dir(cmap: &CharMap) -> Vec<Vec<Option<Direction>>> {
+    let mut visited_dir: Vec<Vec<Option<Direction>>> = cmap.map_to_val(None);
 
     let mut position = cmap.find_first('^').expect("No guard found");
-    let mut direction = To::Top;
+    let mut direction = Direction::Top;
 
     while visited_dir[position.0][position.1].is_none()
         || visited_dir[position.0][position.1].unwrap() != direction
@@ -71,9 +71,9 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
 pub fn get_next_position_and_dir_plus_block(
     cmap: &CharMap,
     position: (usize, usize),
-    direction: To,
+    direction: Direction,
     blocker: (usize, usize),
-) -> Option<((usize, usize), To)> {
+) -> Option<((usize, usize), Direction)> {
     let mut direction = direction;
     let next_pos = direction.move_to(position);
     if next_pos.is_none() || !cmap.is_valid_coords(next_pos.unwrap()) {
@@ -105,7 +105,7 @@ pub fn does_guard_leave(cmap: &CharMap, blocker: (usize, usize)) -> bool {
     let mut visited_dir: Vec<Vec<[bool; 4]>> = cmap.map_to_val([false; 4]);
 
     let mut position = cmap.find_first('^').expect("No guard found");
-    let mut direction = To::Top;
+    let mut direction = Direction::Top;
 
     while !visited_dir[position.0][position.1][direction.to_number() - 1] {
         visited_dir[position.0][position.1][direction.to_number() - 1] = true;
@@ -123,13 +123,13 @@ pub fn does_guard_leave(cmap: &CharMap, blocker: (usize, usize)) -> bool {
 pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let cmap = CharMap::parse_map(reader);
 
-    let mut visited_dir: Vec<Vec<Option<To>>> = cmap.map_to_val(None);
+    let mut visited_dir: Vec<Vec<Option<Direction>>> = cmap.map_to_val(None);
 
     let mut position = cmap.find_first('^').expect("No guard found");
-    let mut direction = To::Top;
+    let mut direction = Direction::Top;
     let mut sum = 0;
     /* Move one up to skip the start point */
-    let next_opt: Option<((usize, usize), To)> =
+    let next_opt: Option<((usize, usize), Direction)> =
         get_next_position_and_dir(&cmap, position, direction);
     (position, direction) = next_opt.unwrap();
 

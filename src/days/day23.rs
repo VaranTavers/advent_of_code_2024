@@ -163,7 +163,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<String, std::io::Error> {
         }
 
         let mut vals_res = None;
-        let mut list: Vec<usize> = list.iter().cloned().collect();
+        let mut list: Vec<usize> = list.to_vec();
         list.push(*i);
 
         let mut vals: Vec<bool> = list.iter().map(|_| false).collect();
@@ -171,7 +171,7 @@ pub fn solution2(reader: BufReader<File>) -> Result<String, std::io::Error> {
         if let Some(vals_res) = vals_res {
             if vals_res.len() > max_len {
                 max_len = vals_res.len();
-                max_inds = vals_res.clone();
+                max_inds.clone_from(&vals_res);
             }
         }
     }

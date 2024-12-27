@@ -5,14 +5,7 @@ use std::{
 };
 
 const LOG: bool = false;
-
-macro_rules! log {
-    ($($x:tt)*) => { if LOG { print!($($x)*) } }
-}
-
-macro_rules! logln {
-    ($($x:tt)*) => { if LOG { println!($($x)*) } }
-}
+use helper_lib::logln;
 
 #[derive(Debug, PartialEq, Eq, Hash)]
 pub struct Key {
@@ -131,7 +124,7 @@ pub fn read_locks_and_keys(mut lines: Lines<BufReader<File>>) -> (HashSet<Lock>,
 }
 
 pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
-    let mut lines = reader.lines();
+    let lines = reader.lines();
 
     let (locks, keys) = read_locks_and_keys(lines);
 
@@ -151,6 +144,6 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
 
 /* SOLUTION 2 */
 
-pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
+pub fn solution2(_reader: BufReader<File>) -> Result<usize, std::io::Error> {
     Ok(0)
 }

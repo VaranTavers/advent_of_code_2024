@@ -3,9 +3,9 @@ use std::{
     io::{BufRead, BufReader},
 };
 
-use helper_lib::utils::{CharMap, To};
+use helper_lib::utils::{CharMap, Direction};
 
-pub fn move_pos(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> (usize, usize) {
+pub fn move_pos(cmap: &mut CharMap, pos: (usize, usize), dir: Direction) -> (usize, usize) {
     let next_pos = dir.move_to(pos);
     if next_pos.is_none() {
         return pos;
@@ -39,13 +39,13 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
         .collect::<Vec<String>>();
     let moves = lines.split_off(lines.iter().position(|x| x.is_empty()).unwrap());
 
-    let mut cmap = CharMap::parse_map_string(lines);
+    let mut cmap = CharMap::parse_map_string(&lines);
 
     //println!("Start: ");
     //println!("{cmap}");
     let mut robot_pos = cmap.find_first('@').expect("No robot found");
     for move_line in moves {
-        for dir in move_line.chars().flat_map(|c| To::try_from(c)) {
+        for dir in move_line.chars().flat_map(|c| Direction::try_from(c)) {
             robot_pos = move_pos(&mut cmap, robot_pos, dir);
             //println!("Move {dir:?}");
             //println!("{cmap}");
@@ -64,7 +64,7 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
 
 /* SOLUTION 2 */
 
-pub fn check_feasibility(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> bool {
+pub fn check_feasibility(cmap: &mut CharMap, pos: (usize, usize), dir: Direction) -> bool {
     //println!("CF {pos:?} {dir:?}");
     let left_pos = if cmap.get(pos) == Some('[') {
         pos
@@ -77,7 +77,7 @@ pub fn check_feasibility(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> bo
     let next_right_pos = dir.move_to(right_pos).unwrap();
 
     match cmap.get(next_left_pos) {
-        Some('[') | Some(']') => {
+        Some('[' | ']') => {
             if !check_feasibility(cmap, next_left_pos, dir) {
                 return false;
             }
@@ -88,7 +88,7 @@ pub fn check_feasibility(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> bo
         }
     }
     match cmap.get(next_right_pos) {
-        Some('[') | Some(']') => {
+        Some('[' | ']') => {
             if !check_feasibility(cmap, next_right_pos, dir) {
                 return false;
             }
@@ -102,7 +102,7 @@ pub fn check_feasibility(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> bo
     true
 }
 
-pub fn move_crate_updown(cmap: &mut CharMap, pos: (usize, usize), dir: To) {
+pub fn move_crate_updown(cmap: &mut CharMap, pos: (usize, usize), dir: Direction) {
     //println!("MOV: {pos:?}, {dir:?}");
     let left_pos = if cmap.get(pos) == Some('[') {
         pos
@@ -115,13 +115,13 @@ pub fn move_crate_updown(cmap: &mut CharMap, pos: (usize, usize), dir: To) {
     let next_right_pos = dir.move_to(right_pos).unwrap();
 
     match cmap.get(next_left_pos) {
-        Some('[') | Some(']') => {
+        Some('[' | ']') => {
             move_crate_updown(cmap, next_left_pos, dir);
         }
         _ => {}
     }
     match cmap.get(next_right_pos) {
-        Some('[') | Some(']') => {
+        Some('[' | ']') => {
             move_crate_updown(cmap, next_right_pos, dir);
         }
         _ => {}
@@ -138,21 +138,21 @@ pub fn move_crate_updown(cmap: &mut CharMap, pos: (usize, usize), dir: To) {
     //println!("{cmap}");
 }
 
-pub fn move_crate(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> (usize, usize) {
+pub fn move_crate(cmap: &mut CharMap, pos: (usize, usize), dir: Direction) -> (usize, usize) {
     //println!("{pos:?}");
     let next_pos = dir.move_to(pos);
     if next_pos.is_none() {
         return pos;
     }
     let next_pos = next_pos.unwrap();
-    if dir == To::Right || dir == To::Left {
+    if dir == Direction::Right || dir == Direction::Left {
         return match cmap.get(next_pos) {
             Some('.') => {
                 cmap.map[next_pos.0][next_pos.1] = cmap.map[pos.0][pos.1];
                 cmap.map[pos.0][pos.1] = '.';
                 next_pos
             }
-            Some(']') | Some('[') => {
+            Some(']' | '[') => {
                 move_crate(cmap, next_pos, dir);
                 match cmap.get(next_pos) {
                     Some('.') => {
@@ -165,16 +165,17 @@ pub fn move_crate(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> (usize, u
             }
             _ => pos,
         };
-    } else {
-        if check_feasibility(cmap, pos, dir) {
-            move_crate_updown(cmap, pos, dir);
-            return next_pos;
-        }
-        return pos;
     }
+
+    if check_feasibility(cmap, pos, dir) {
+        move_crate_updown(cmap, pos, dir);
+        return next_pos;
+    }
+
+    pos
 }
 
-pub fn move_pos_2(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> (usize, usize) {
+pub fn move_pos_2(cmap: &mut CharMap, pos: (usize, usize), dir: Direction) -> (usize, usize) {
     let next_pos = dir.move_to(pos);
     if next_pos.is_none() {
         return pos;
@@ -186,7 +187,7 @@ pub fn move_pos_2(cmap: &mut CharMap, pos: (usize, usize), dir: To) -> (usize, u
             cmap.map[pos.0][pos.1] = '.';
             next_pos
         }
-        Some('[') | Some(']') => {
+        Some('[' | ']') => {
             move_crate(cmap, next_pos, dir);
             match cmap.get(next_pos) {
                 Some('.') => {
@@ -216,13 +217,13 @@ pub fn solution2(reader: BufReader<File>) -> Result<i64, std::io::Error> {
     let moves = lines.split_off(lines.iter().position(|x| x.is_empty()).unwrap());
 
     lines = lines.iter().map(|s| duplicate_chars(s)).collect();
-    let mut cmap = CharMap::parse_map_string(lines);
+    let mut cmap = CharMap::parse_map_string(&lines);
 
     //println!("Start: ");
     //println!("{cmap}");
     let mut robot_pos = cmap.find_first('@').expect("No robot found");
     for move_line in moves {
-        for dir in move_line.chars().flat_map(|c| To::try_from(c)) {
+        for dir in move_line.chars().flat_map(|c| Direction::try_from(c)) {
             robot_pos = move_pos_2(&mut cmap, robot_pos, dir);
             //println!("Move {dir:?}");
             //println!("{cmap}");

@@ -24,9 +24,8 @@ pub fn next_secret_number(num: u64) -> u64 {
     let mult: u64 = num.mix(num * 64).prune();
 
     let div = mult.mix(mult / 32).prune();
-    let mult2 = div.mix(div * 2048).prune();
 
-    mult2
+    div.mix(div * 2048).prune()
 }
 
 pub fn solution(reader: BufReader<File>) -> Result<u64, std::io::Error> {
@@ -50,7 +49,8 @@ pub fn test_solution_one(sol: &[i64], diffs: &[i64], vals: &[u64]) -> u64 {
             return vals[i + window.len()] % 10;
         }
     }
-    return 0;
+
+    0
 }
 
 pub fn test_solution(sol: &[i64], all_diffs: &[Vec<i64>], all_vals: &[Vec<u64>]) -> u64 {

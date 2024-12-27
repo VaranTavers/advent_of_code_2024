@@ -17,7 +17,7 @@ impl CharMap {
         CharMap { map }
     }
     #[must_use]
-    pub fn parse_map_string(reader: Vec<String>) -> CharMap {
+    pub fn parse_map_string(reader: &[String]) -> CharMap {
         let map = reader
             .iter()
             .map(|line| line.chars().collect())
@@ -198,8 +198,8 @@ impl FromStr for CharMap {
     }
 }
 
-impl Into<CharMap> for &str {
-    fn into(self) -> CharMap {
-        CharMap::from_str(self).unwrap()
+impl From<&str> for CharMap {
+    fn from(value: &str) -> Self {
+        CharMap::from_str(value).unwrap()
     }
 }

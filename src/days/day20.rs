@@ -1,6 +1,6 @@
 use std::{cmp::Reverse, collections::BinaryHeap, fs::File, io::BufReader};
 
-use helper_lib::utils::{CharMap, To};
+use helper_lib::utils::{CharMap, Direction};
 
 const MIN_SAVED: usize = 100;
 const CHEAT_DIST: i64 = 20;
@@ -16,7 +16,7 @@ pub fn dijkstra_all(cmap: &CharMap, pos: (usize, usize)) -> Vec<Vec<Option<usize
         let (c_val, c_pos) = points.pop().unwrap();
         //println!("{c_val:?} {c_pos:?} {c_dir:?}");
 
-        for n_dir in To::cardinal_directions() {
+        for n_dir in Direction::cardinal_directions() {
             if let Some(next_pos) = n_dir.move_to(c_pos) {
                 if cmap.is_valid_coords(next_pos)
                     && min_dist[next_pos.0][next_pos.1].is_none()
@@ -44,35 +44,36 @@ pub fn solution(reader: BufReader<File>) -> Result<usize, std::io::Error> {
 
     let mut cheats = Vec::new();
     for (row, col, c) in cmap.iter() {
-        if row != 0 && col != 0 && row < cmap.map.len() - 1 && col < cmap.map[row].len() - 1 {
-            if c == '#' {
-                let mut free_pos = Vec::new();
-                for dir in To::cardinal_directions() {
-                    let next_pos = dir.move_to((row, col)).unwrap();
-                    if cmap.get(next_pos).unwrap() != '#' {
-                        free_pos.push(next_pos);
-                    }
+        if row != 0
+            && col != 0
+            && row < cmap.map.len() - 1
+            && col < cmap.map[row].len() - 1
+            && c == '#'
+        {
+            let mut free_pos = Vec::new();
+            for dir in Direction::cardinal_directions() {
+                let next_pos = dir.move_to((row, col)).unwrap();
+                if cmap.get(next_pos).unwrap() != '#' {
+                    free_pos.push(next_pos);
                 }
-                if free_pos.len() == 2 {
+            }
+            if free_pos.len() == 2 {
+                if start_ds[free_pos[0].0][free_pos[0].1].unwrap()
+                    < start_ds[free_pos[1].0][free_pos[1].1].unwrap()
+                {
                     if start_ds[free_pos[0].0][free_pos[0].1].unwrap()
-                        < start_ds[free_pos[1].0][free_pos[1].1].unwrap()
+                        + 2
+                        + end_ds[free_pos[1].0][free_pos[1].1].unwrap()
+                        <= start_ds[end_pos.0][end_pos.1].unwrap() - MIN_SAVED
                     {
-                        if start_ds[free_pos[0].0][free_pos[0].1].unwrap()
-                            + 2
-                            + end_ds[free_pos[1].0][free_pos[1].1].unwrap()
-                            <= start_ds[end_pos.0][end_pos.1].unwrap() - MIN_SAVED
-                        {
-                            cheats.push((row, col));
-                        }
-                    } else {
-                        if start_ds[free_pos[1].0][free_pos[1].1].unwrap()
-                            + 2
-                            + end_ds[free_pos[0].0][free_pos[0].1].unwrap()
-                            <= start_ds[end_pos.0][end_pos.1].unwrap() - MIN_SAVED
-                        {
-                            cheats.push((row, col));
-                        }
+                        cheats.push((row, col));
                     }
+                } else if start_ds[free_pos[1].0][free_pos[1].1].unwrap()
+                    + 2
+                    + end_ds[free_pos[0].0][free_pos[0].1].unwrap()
+                    <= start_ds[end_pos.0][end_pos.1].unwrap() - MIN_SAVED
+                {
+                    cheats.push((row, col));
                 }
             }
         }
@@ -95,33 +96,34 @@ pub fn solution2(reader: BufReader<File>) -> Result<usize, std::io::Error> {
     let mut res = 0;
     //println!("{end_ds:?}");
     for (row, col, _c) in cmap.iter() {
-        if row != 0 && col != 0 && row < cmap.map.len() - 1 && col < cmap.map[row].len() - 1 {
-            if start_ds[row][col].is_some() {
-                for i in -CHEAT_DIST..=CHEAT_DIST as i64 {
-                    for j in -CHEAT_DIST..=CHEAT_DIST as i64 {
-                        let ii = i + row as i64;
-                        let jj = j + col as i64;
-                        if i.abs() + j.abs() <= 20
-                            && ii >= 0
-                            && jj >= 0 as i64
-                            && (ii as usize) < start_ds.len()
-                            && (jj as usize) < start_ds[ii as usize].len()
+        if row != 0
+            && col != 0
+            && row < cmap.map.len() - 1
+            && col < cmap.map[row].len() - 1
+            && start_ds[row][col].is_some()
+        {
+            for i in -CHEAT_DIST..=CHEAT_DIST {
+                for j in -CHEAT_DIST..=CHEAT_DIST {
+                    let ii = i + row as i64;
+                    let jj = j + col as i64;
+                    if i.abs() + j.abs() <= 20
+                        && ii >= 0
+                        && jj >= 0 as i64
+                        && (ii as usize) < start_ds.len()
+                        && (jj as usize) < start_ds[ii as usize].len()
+                    {
+                        let ii = ii as usize;
+                        let jj = jj as usize;
+                        //println!("{row} {col}");
+                        if cmap.get((ii, jj)) != Some('#')
+                            && start_ds[row][col].unwrap() < start_ds[ii][jj].unwrap()
+                            && start_ds[row][col].unwrap()
+                                + i.abs() as usize
+                                + j.abs() as usize
+                                + end_ds[ii][jj].unwrap()
+                                <= start_ds[end_pos.0][end_pos.1].unwrap() - MIN_SAVED
                         {
-                            let ii = ii as usize;
-                            let jj = jj as usize;
-                            //println!("{row} {col}");
-                            if cmap.get((ii, jj)) != Some('#') {
-                                if start_ds[row][col].unwrap() < start_ds[ii][jj].unwrap() {
-                                    if start_ds[row][col].unwrap()
-                                        + i.abs() as usize
-                                        + j.abs() as usize
-                                        + end_ds[ii][jj].unwrap()
-                                        <= start_ds[end_pos.0][end_pos.1].unwrap() - MIN_SAVED
-                                    {
-                                        res += 1;
-                                    }
-                                }
-                            }
+                            res += 1;
                         }
                     }
                 }

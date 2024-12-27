@@ -1,6 +1,6 @@
 use std::{cmp::Reverse, collections::BinaryHeap, fs::File, io::BufReader};
 
-use helper_lib::utils::{CharMap, To};
+use helper_lib::utils::{CharMap, Direction};
 
 pub fn get_path(pos: (usize, usize), prev: &[Vec<Option<(usize, usize)>>]) -> Vec<(usize, usize)> {
     let mut res = vec![pos];
@@ -18,7 +18,7 @@ pub fn get_path(pos: (usize, usize), prev: &[Vec<Option<(usize, usize)>>]) -> Ve
 
 pub fn dijkstra(cmap: &CharMap, pos: (usize, usize)) -> (Vec<(usize, usize)>, usize) {
     let mut points = BinaryHeap::new();
-    points.push((Reverse(0), pos, To::Right));
+    points.push((Reverse(0), pos, Direction::Right));
     let mut visited = cmap.map_to_val(false);
     visited[pos.0][pos.1] = true;
     let mut prev: Vec<Vec<Option<(usize, usize)>>> = cmap.map_to_val(None);
@@ -125,27 +125,35 @@ pub fn dijkstra_all_dists(cmap: &CharMap, pos: (usize, usize)) -> Vec<Vec<[Optio
     dist[pos.0][pos.1] = [Some(0); 4];
 
     if cmap.get(pos) == Some('S') {
-        dist[pos.0][pos.1][To::Top.to_index()] = Some(1000);
-        dist[pos.0][pos.1][To::Right.to_index()] = Some(0);
-        points.push((Reverse(0), pos, To::Right));
-        if cmap.get(To::Right.move_to(pos).unwrap()) == Some('.') {
-            points.push((Reverse(1), To::Right.move_to(pos).unwrap(), To::Right));
+        dist[pos.0][pos.1][Direction::Top.to_index()] = Some(1000);
+        dist[pos.0][pos.1][Direction::Right.to_index()] = Some(0);
+        points.push((Reverse(0), pos, Direction::Right));
+        if cmap.get(Direction::Right.move_to(pos).unwrap()) == Some('.') {
+            points.push((
+                Reverse(1),
+                Direction::Right.move_to(pos).unwrap(),
+                Direction::Right,
+            ));
         }
-        if cmap.get(To::Top.move_to(pos).unwrap()) == Some('.') {
-            points.push((Reverse(1001), To::Top.move_to(pos).unwrap(), To::Top));
+        if cmap.get(Direction::Top.move_to(pos).unwrap()) == Some('.') {
+            points.push((
+                Reverse(1001),
+                Direction::Top.move_to(pos).unwrap(),
+                Direction::Top,
+            ));
         }
     } else {
-        let next_dir = To::Left;
+        let next_dir = Direction::Left;
         let next_pos = next_dir.move_to(pos).unwrap();
         if cmap.get(next_pos) == Some('.') {
             dist[next_pos.0][next_pos.1][next_dir.to_index()] = Some(1);
-            points.push((Reverse(1), next_pos, To::Left));
+            points.push((Reverse(1), next_pos, Direction::Left));
         }
-        let next_dir = To::Bottom;
+        let next_dir = Direction::Bottom;
         let next_pos = next_dir.move_to(pos).unwrap();
         if cmap.get(next_pos) == Some('.') {
             dist[next_pos.0][next_pos.1][next_dir.to_index()] = Some(1);
-            points.push((Reverse(1), next_pos, To::Bottom));
+            points.push((Reverse(1), next_pos, Direction::Bottom));
         }
     }
 
@@ -217,15 +225,13 @@ pub fn is_on_road(dist_ss: &[Option<usize>], dist_es: &[Option<usize>], res_len:
             println!("FROM_END: {dist_es:?}");
             for (j, dist_e) in dist_es.iter().enumerate() {
                 if let Some(dist_e) = dist_e {
-                    if i == To::from_number(j + 1).turn_180().to_index() {
+                    if i == Direction::from_number(j + 1).unwrap().turn_180().to_index() {
                         println!("{} = {} + {}", dist_s + dist_e, dist_s, dist_e);
                         if dist_s + dist_e == res_len {
                             return true;
                         }
-                    } else if i != j {
-                        if dist_s + dist_e + 1000 == res_len {
-                            return true;
-                        }
+                    } else if i != j && dist_s + dist_e + 1000 == res_len {
+                        return true;
                     }
                 }
             }

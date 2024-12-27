@@ -1,5 +1,10 @@
+use std::{
+    error::Error,
+    fmt::{Debug, Display},
+};
+
 #[derive(PartialEq, Eq, PartialOrd, Ord, Debug, Clone, Copy)]
-pub enum To {
+pub enum Direction {
     Bottom,
     Left,
     Top,
@@ -10,7 +15,7 @@ pub enum To {
     BottomLeft,
 }
 
-impl To {
+impl Direction {
     #[must_use]
     pub fn move_to(&self, (row, col): (usize, usize)) -> Option<(usize, usize)> {
         match self {
@@ -139,32 +144,68 @@ impl To {
         self.to_number() - 1
     }
 
-    pub fn from_number(num: usize) -> Self {
+    #[must_use]
+    pub fn from_number(num: usize) -> Result<Self, ParseDirectionError<usize>> {
         match num {
-            5 => Self::TopLeft,
-            1 => Self::Top,
-            6 => Self::TopRight,
-            2 => Self::Left,
-            3 => Self::Right,
-            7 => Self::BottomLeft,
-            4 => Self::Bottom,
-            8 => Self::BottomRight,
-            _ => Self::Top,
+            5 => Ok(Self::TopLeft),
+            1 => Ok(Self::Top),
+            6 => Ok(Self::TopRight),
+            2 => Ok(Self::Left),
+            3 => Ok(Self::Right),
+            7 => Ok(Self::BottomLeft),
+            4 => Ok(Self::Bottom),
+            8 => Ok(Self::BottomRight),
+            _ => Err(ParseDirectionError::new(num)),
         }
     }
 }
 
-impl TryFrom<char> for To {
-    type Error = ();
+impl TryFrom<usize> for Direction {
+    type Error = ParseDirectionError<usize>;
+
+    fn try_from(value: usize) -> Result<Self, Self::Error> {
+        Self::from_number(value)
+    }
+}
+
+impl TryFrom<char> for Direction {
+    type Error = ParseDirectionError<char>;
 
     fn try_from(value: char) -> Result<Self, Self::Error> {
         match value {
             '^' => Ok(Self::Top),
             '<' => Ok(Self::Left),
             '>' => Ok(Self::Right),
-            'V' => Ok(Self::Bottom),
-            'v' => Ok(Self::Bottom),
-            _ => Err(()),
+            'V' | 'v' => Ok(Self::Bottom),
+            _ => Err(ParseDirectionError::new(value)),
         }
+    }
+}
+
+pub struct ParseDirectionError<T: Copy> {
+    pub val: T,
+}
+
+impl<T: Copy + Debug + Display> ParseDirectionError<T> {
+    pub fn new(val: T) -> Self {
+        Self { val }
+    }
+}
+
+impl<T: Copy + Debug> Debug for ParseDirectionError<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Could not parse {:?} into a direction", self.val)
+    }
+}
+
+impl<T: Copy + Display> Display for ParseDirectionError<T> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Could not parse {} into a direction", self.val)
+    }
+}
+
+impl<T: std::marker::Copy + Debug + Display> Error for ParseDirectionError<T> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        None
     }
 }

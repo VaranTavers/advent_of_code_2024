@@ -1,13 +1,13 @@
 use std::{collections::HashSet, fs::File, io::BufReader};
 
-use helper_lib::utils::{CharMap, To};
+use helper_lib::utils::{CharMap, Direction};
 
 const TRAIL_CHARS: [char; 10] = ['9', '8', '7', '6', '5', '4', '3', '2', '1', '0'];
 
 fn backtrack(
     k: usize,
     way: &mut Vec<(usize, usize)>,
-    dirs: &[To],
+    dirs: &[Direction],
     cmap: &CharMap,
     result: &mut HashSet<(usize, usize)>,
 ) {
@@ -32,7 +32,7 @@ pub fn find_zeros_accessible(cmap: &CharMap, (i, j): (usize, usize)) -> HashSet<
     if cmap.get((i, j)).unwrap() == '9' {
         let mut way = Vec::new();
         way.push((i, j));
-        backtrack(0, &mut way, &To::cardinal_directions(), cmap, &mut result);
+        backtrack(0, &mut way, &Direction::cardinal_directions(), cmap, &mut result);
         println!("{i} {j} {result:?}");
     }
     result
@@ -57,7 +57,7 @@ pub fn solution(reader: BufReader<File>) -> Result<i64, std::io::Error> {
 fn backtrack_2(
     k: usize,
     way: &mut Vec<(usize, usize)>,
-    dirs: &[To],
+    dirs: &[Direction],
     cmap: &CharMap,
     result: &mut Vec<(usize, usize)>,
 ) {
@@ -82,7 +82,7 @@ pub fn find_zeros_accessible_2(cmap: &CharMap, (i, j): (usize, usize)) -> Vec<(u
     if cmap.get((i, j)).unwrap() == '9' {
         let mut way = Vec::new();
         way.push((i, j));
-        backtrack_2(0, &mut way, &To::cardinal_directions(), cmap, &mut result);
+        backtrack_2(0, &mut way, &Direction::cardinal_directions(), cmap, &mut result);
         println!("{i} {j} {result:?}");
     }
     result
